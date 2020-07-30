@@ -71,7 +71,8 @@ class CubeUgrid(
     * topology_dimension (int):
         The highest dimensionality of the geometric elements in the mesh.
     * node_coordinates (list):
-        A list of the names of the spatial coordinates, used to geolocate the nodes.
+        A list of the names of the spatial coordinates, i
+        used to geolocate the nodes.
     """
 
     def __str__(self):
@@ -228,4 +229,3 @@ class UGridCFReader:
     def __del__(self):
         # Explicitly close dataset to prevent file remaining open.
         self.dataset.close()
-
