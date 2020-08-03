@@ -125,21 +125,11 @@ class UGridCFReader:
         # Generate list of excluded variable names.
         exclude_vars = list(meshes.keys())
 
-        temp_xios_fix = kwargs.pop("temp_xios_fix", False)
-        if not temp_xios_fix:
-            # This way *ought* to work, but maybe problems with the test file ?
-            for mesh in meshes.values():
-                mesh_var = dataset.variables[mesh.mesh_name]
-                for attr in mesh_var.ncattrs():
-                    if attr in _UGRID_LINK_PROPERTIES:
-                        exclude_vars.extend(mesh_var.getncattr(attr).split())
-        else:
-            # A crude and XIOS-specific alternative ..
-            exclude_vars += [
-                name
-                for name in dataset.variables.keys()
-                if any(name.startswith(meshname) for meshname in meshes.keys())
-            ]
+        for mesh in meshes.values():
+            mesh_var = dataset.variables[mesh.mesh_name]
+            for attr in mesh_var.ncattrs():
+                if attr in _UGRID_LINK_PROPERTIES:
+                    exclude_vars.extend(mesh_var.getncattr(attr).split())
 
         # Identify possible mesh dimensions and make a map of them.
         meshdims_map = {}  # Maps {dimension-name: (mesh, mesh-location)}
