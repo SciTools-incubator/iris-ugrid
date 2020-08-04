@@ -1,0 +1,12 @@
+install:
+
+  export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07";
+  export IRIS_TEST_DATA_SUFFIX=$(echo "${IRIS_TEST_DATA_REF}" | sed "s/^v//");
+
+  # iris test data
+  - >
+    if [[ "${TEST_MINIMAL}" != true ]]; then
+      wget --quiet -O iris-test-data.zip https://github.com/SciTools/iris-test-data/archive/${IRIS_TEST_DATA_REF}.zip;
+      unzip -q iris-test-data.zip;
+      mv "iris-test-data-${IRIS_TEST_DATA_SUFFIX}" iris-test-data;
+    fi
