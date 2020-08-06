@@ -70,15 +70,15 @@ install:
     echo "[System]" >> ${SITE_CFG};
     echo "udunits2_path = ${PREFIX}/lib/libudunits2.so" >> ${SITE_CFG};
 
-  # install iris itself
-  - >
-    cd iris;
-    python setup.py --quiet install;
-
   # Output environment debug info
   - >
     conda list -n ${ENV_NAME};
     conda info -a;
+
+  # install iris itself
+  - >
+    cd iris;
+    pip install -e .python setup.py --quiet install;
 
   # Finally, install iris-ugrid itself.
   # FOR NOW : just put it on the module searchpath (no actual install code)
@@ -87,5 +87,9 @@ install:
 
 script:
 
-  - python -m unittest discover -v ./iris_ugrid/tests
-
+  - >
+    echo "Testing : initial PYTHONPATH=${PYTHONPATH}";
+    echo "Tests running from : $(pwd)";
+    export PYTHONPATH=$(readlink -f .):${PYTHONPATH};
+    echo "Testing : adjusted PYTHONPATH=${PYTHONPATH}";
+    python -m unittest discover -v ./iris_ugrid/tests;
