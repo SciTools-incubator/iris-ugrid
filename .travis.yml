@@ -1,6 +1,10 @@
 language: minimal
 dist: xenial
 
+env:
+  matrix:
+    - PYTHON_VERSION=3.7
+
 install:
 
   # iris test-data reference is just a commit
