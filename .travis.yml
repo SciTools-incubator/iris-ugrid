@@ -60,7 +60,12 @@ install:
     conda install --quiet -n ${ENV_NAME} --file ${CONDA_REQS_FILE};
 
   # Conda-install our own additional dependencies.
-  - conda install gridded
+  - conda install --file conda_requirements.txt
+
+  # Output environment debug info
+  - >
+    conda list -n ${ENV_NAME};
+    conda info -a;
 
   # set iris config paths
   - >
@@ -71,11 +76,6 @@ install:
     echo "doc_dir = $(pwd)/docs/iris" >> ${SITE_CFG};
     echo "[System]" >> ${SITE_CFG};
     echo "udunits2_path = ${PREFIX}/lib/libudunits2.so" >> ${SITE_CFG};
-
-  # Output environment debug info
-  - >
-    conda list -n ${ENV_NAME};
-    conda info -a;
 
   # install iris
   - >

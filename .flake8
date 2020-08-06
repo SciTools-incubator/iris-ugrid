@@ -5,16 +5,8 @@
 #   https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
 
 ignore =
-    # E203: whitespace before ':'
-    E203,
-    # E226: missing whitespace around arithmetic operator
-    E226,
-    # E231: missing whitespace after ',', ';', or ':'
-    E231,
-    # E402: module level imports on one line
+    # E402: module level imports at top of file
     E402,
-    # E501: line too long
-    E501,
     # W503: line break before binary operator
     W503,
     # W504: line break after binary operator
@@ -25,16 +17,3 @@ exclude =
     #
     .eggs,
     build,
-    compiled_krb,
-    docs/iris/src/sphinxext/*,
-    tools/*,
-    #
-    # ignore auto-generated files
-    #
-    _ff_cross_refrences.py,
-    std_names.py,
-    um_cf_map.py,
-    #
-    # ignore third-party files
-    #
-    gitwash_dumper.py,
