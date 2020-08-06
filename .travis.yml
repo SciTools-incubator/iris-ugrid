@@ -1,0 +1,88 @@
+language: minimal
+dist: xenial
+
+install:
+
+  # iris test-data reference is just a commit
+  export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07";
+
+  # iris reference is to the latest "ng-vat_v2" branch
+  export IRIS_BRANCH="ng-vat_v2";
+
+  # download and install iris test data
+  - >
+    if [[ "${TEST_MINIMAL}" != true ]]; then
+      wget --quiet -O iris-test-data.zip https://github.com/SciTools/iris-test-data/archive/${IRIS_TEST_DATA_REF}.zip;
+      unzip -q iris-test-data.zip;
+      mv "iris-test-data-${IRIS_TEST_DATA_REF}" iris-test-data;
+    fi
+
+  # download iris branch
+  - >
+    wget --quiet -O iris.zip wget https://github.com/SciTools/iris/archive/${IRIS_BRANCH}.zip
+    unzip -q iris.zip;
+    mv "iris-${IRIS_BRANCH}" iris;
+
+  # install miniconda
+  - >
+    echo 'Installing miniconda';
+    export CONDA_BASE="https://repo.continuum.io/miniconda/Miniconda";
+    wget --quiet ${CONDA_BASE}3-latest-Linux-x86_64.sh -O miniconda.sh;
+    bash miniconda.sh -b -p ${HOME}/miniconda;
+    export PATH="${HOME}/miniconda/bin:${PATH}";
+
+  # Create the testing conda environment
+  # ------------------------------------
+  # Explicitly add defaults channel, see https://github.com/conda/conda/issues/2675
+  - >
+    echo 'Configure conda and create an environment';
+    conda config --set always_yes yes --set changeps1 no;
+    conda config --set show_channel_urls True;
+    conda config --add channels conda-forge;
+    conda update --quiet conda;
+    export ENV_NAME='test-environment';
+    conda create --quiet -n ${ENV_NAME} python=${PYTHON_VERSION} pip;
+    source activate ${ENV_NAME};
+
+  # Install iris dependencies via conda, using iris/gen_conda_requirements.py
+  # -------------------------------------------------------------------------
+  - >
+    echo 'Install Iris + its test dependencies';
+    CONDA_REQS_GROUPS="test";
+    CONDA_REQS_FILE="conda-requirements.txt";
+    python iris/requirements/gen_conda_requirements.py --groups ${CONDA_REQS_GROUPS} > ${CONDA_REQS_FILE};
+    conda install --quiet -n ${ENV_NAME} --file ${CONDA_REQS_FILE};
+
+  # Conda-install our own additional dependencies.
+  - >
+    conda install gridded
+
+  # set iris config paths
+  - >
+    export PREFIX="${HOME}/miniconda/envs/${ENV_NAME}";
+    SITE_CFG="iris/lib/iris/etc/site.cfg";
+    echo "[Resources]" > ${SITE_CFG};
+    echo "test_data_dir = $(pwd)/iris-test-data/test_data" >> ${SITE_CFG};
+    echo "doc_dir = $(pwd)/docs/iris" >> ${SITE_CFG};
+    echo "[System]" >> ${SITE_CFG};
+    echo "udunits2_path = ${PREFIX}/lib/libudunits2.so" >> ${SITE_CFG};
+
+  # install iris itself
+  - >
+    cd iris;
+    python setup.py --quiet install;
+
+  # Output environment debug info
+  - >
+    conda list -n ${ENV_NAME};
+    conda info -a;
+
+  # Finally, install iris-ugrid itself.
+  # FOR NOW : just put it on the module searchpath (no actual install code)
+  - export PYTHONPATH=$(readlink -f .):$PYTHONPATH
+
+
+script:
+
+  - python -m unittest discover -v ./iris_ugrid/tests
+
