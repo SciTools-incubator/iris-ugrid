@@ -10,10 +10,10 @@ install:
   - export INSTALL_DIR=${pwd}
 
   # iris test-data reference is just a commit
-  - export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07";
+  - export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07"
 
   # iris reference is to the latest "ng-vat_v2" branch
-  - export IRIS_BRANCH="ng-vat_v2";
+  - export IRIS_BRANCH="ng-vat_v2"
 
   # download and install iris test data
   - >
@@ -90,10 +90,4 @@ install:
 
 script:
 
-  - >
-    echo "Testing : recall install dir = ${INSTALL_DIR}";
-    echo "Tests running from : $(pwd)";
-    echo "Testing : initial PYTHONPATH=${PYTHONPATH}";
-    export PYTHONPATH=$(pwd):${PYTHONPATH};
-    echo "Testing : adjusted PYTHONPATH=${PYTHONPATH}";
-    python -m unittest discover -v ./iris_ugrid/tests;
+  - python -m unittest discover -v ./iris_ugrid/tests
