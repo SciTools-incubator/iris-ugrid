@@ -6,6 +6,8 @@ env:
     - PYTHON_VERSION=3.7
 
 install:
+  # capture installation dir
+  - export INSTALL_DIR=${pwd}
 
   # iris test-data reference is just a commit
   - export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07";
@@ -82,12 +84,14 @@ install:
 
   # Finally, install iris-ugrid itself.
   # FOR NOW : just put it on the module searchpath (no actual install code)
+  - cd ..;
   - export PYTHONPATH=$(readlink -f .):$PYTHONPATH;
 
 
 script:
 
   - >
+    echo "Testing : recall install dir = ${INSTALL_DIR}";
     echo "Tests running from : $(pwd)";
     echo "Testing : initial PYTHONPATH=${PYTHONPATH}";
     export PYTHONPATH=$(pwd):${PYTHONPATH};
