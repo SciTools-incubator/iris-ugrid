@@ -17,7 +17,3 @@ def test_iris_installation():
         import Test_exclude_vars
 
     assert hasattr(Test_exclude_vars, 'test_exclude_vars')
-
-
-def test_failure():
-    assert False
