@@ -1,0 +1,19 @@
+[flake8]
+# References:
+#   https://flake8.readthedocs.io/en/latest/user/configuration.html
+#   https://flake8.readthedocs.io/en/latest/user/error-codes.html
+#   https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
+
+ignore =
+    # E402: module level imports at top of file
+    E402,
+    # W503: line break before binary operator
+    W503,
+    # W504: line break after binary operator
+    W504,
+exclude =
+    #
+    # ignore the following directories
+    #
+    .eggs,
+    build,
