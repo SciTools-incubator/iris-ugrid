@@ -15,10 +15,9 @@ import iris.tests as tests
 
 from gridded.pyugrid.ugrid import UGrid
 
-from iris.cube import CubeList
-from iris.fileformats.ugrid_cf_reader import CubeUgrid
 from iris import Constraint
-from iris.fileformats.netcdf import load_cubes
+from iris.cube import CubeList
+from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
 
 
 @tests.skip_data
@@ -33,7 +32,7 @@ class TestUgrid(tests.IrisTest):
         # the cube 'ugrid' properties.
 
         # Here's a thing that at least works.
-        loaded_cubes = CubeList(load_cubes(file_path, temp_xios_fix=True))
+        loaded_cubes = CubeList(load_cubes(file_path))
 
         # Just check some expected details.
         self.assertEqual(len(loaded_cubes), 2)

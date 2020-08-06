@@ -16,7 +16,9 @@ from gridded.pyugrid.read_netcdf import (
     find_mesh_names,
     load_grid_from_nc_dataset,
 )
-from iris.fileformats.cf import CFReader
+
+import iris.fileformats.cf
+import iris.fileformats.netcdf
 
 
 _UGRID_ELEMENT_TYPE_NAMES = ("node", "edge", "face", "volume")
@@ -168,10 +170,13 @@ class UGridCFReader:
 
         # Create a CFReader object which skips the UGRID-related variables.
         kwargs["exclude_var_names"] = exclude_vars
-        self.cfreader = CFReader(self.dataset, *args, **kwargs)
+        self.cfreader = iris.fileformats.cf.CFReader(self.dataset, *args, **kwargs)
 
-    def complete_ugrid_cube(self, cube):
+    def complete_unstructured_cube(self, cube):
         """
+        Cube post-processing hook called by :func:`iris.fileformats.netcdf.load_cubes`, to add the unstructured info
+        onto a cube newly created by the `self.cfreader`.
+
         Add the ".ugrid" property to a cube loaded with the `self.cfreader`.
         We identify the unstructured-grid dimension of the cube (if any), and
         attach a suitable CubeUgrid object, linking the cube mesh dimension to
@@ -214,8 +219,16 @@ class UGridCFReader:
         else:
             # Add an empty 'cube.ugrid' to all cubes otherwise.
             cube.ugrid = None
-        return
 
-    def __del__(self):
-        # Explicitly close dataset to prevent file remaining open.
-        self.dataset.close()
+
+def load_cubes(filenames, callback=None):
+    def create_ugrid_reader(filename):
+        """Function to create a CFReader object which is patched to do ugrid operations."""
+        ugrid_reader = UGridCFReader(filename)
+        # We must return the inner, actual CFReader object..
+        inner_cf_reader = ugrid_reader.cfreader
+        # .. but we also create on it a 'cube_completion' method, which the loader operation will call for us.
+        inner_cf_reader.cube_completion_adjust = ugrid_reader.complete_unstructured_cube
+        return inner_cf_reader
+
+    return iris.fileformats.netcdf.load_cubes(filenames, callback=callback, create_reader=create_ugrid_reader)
