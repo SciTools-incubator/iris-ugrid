@@ -90,4 +90,4 @@ install:
 
 script:
 
-  - python -m unittest discover -v ./iris_ugrid/tests
+  - pytest -v ./iris_ugrid/tests
