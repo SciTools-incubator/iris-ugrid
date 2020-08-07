@@ -12,8 +12,8 @@ install:
   # iris test-data reference is just a commit
   - export IRIS_TEST_DATA_REF="672dbb46c986038fa5d06a3d8aad691fd1951e07"
 
-  # iris reference is to the latest "ng-vat_v2" branch
-  - export IRIS_BRANCH="ng-vat_v2"
+  # iris reference is to the latest "ugrid" branch
+  - export IRIS_BRANCH="ugrid"
 
   # download and install iris test data
   - >
