@@ -229,6 +229,7 @@ def _get_regrid_weights_dict(src_field, tgt_field):
     regridder.destroy()
     return weights_dict
 
+
 def _weights_dict_to_sparse_array(weights, shape, index_offsets):
     matrix = scipy.sparse.csr_matrix(
         (
@@ -244,18 +245,32 @@ def _weights_dict_to_sparse_array(weights, shape, index_offsets):
 
 
 class Regridder:
-    def __init__(self, src, tgt):
+    def __init__(self, src, tgt, precomputed_weights=None):
         self.src = src
         self.tgt = tgt
 
-        weights_dict = _get_regrid_weights_dict(
-            src.make_esmf_field(), tgt.make_esmf_field()
-        )
-        self.weight_matrix = _weights_dict_to_sparse_array(
-            weights_dict,
-            (self.tgt.size(), self.src.size()),
-            (self.tgt._index_offset(), self.src._index_offset()),
-        )
+        if precomputed_weights is None:
+            weights_dict = _get_regrid_weights_dict(
+                src.make_esmf_field(), tgt.make_esmf_field()
+            )
+            self.weight_matrix = _weights_dict_to_sparse_array(
+                weights_dict,
+                (self.tgt.size(), self.src.size()),
+                (self.tgt._index_offset(), self.src._index_offset()),
+            )
+        else:
+            if not scipy.sparse.isspmatrix(precomputed_weights):
+                raise ValueError(
+                    "Precomputed weights must be given as a sparse matrix."
+                )
+            if precomputed_weights.shape != (self.tgt.size(), self.src.size()):
+                msg = "Expected precomputed weights to have shape {}, got shape {} instead."
+                raise ValueError(
+                    msg.format(
+                        (self.tgt.size(), self.src.size()), precomputed_weights.shape
+                    )
+                )
+            self.weight_matrix = precomputed_weights
 
     def regrid(self, src_array, mdtol=1):
         # A rudimentary filter is applied to mask data which is mapped from an
@@ -268,6 +283,9 @@ class Regridder:
         # how this affects the mathematics and if it can be replicated after the fact
         # using just the weights or if ESMF is doing something we want access to.
         weight_sums = np.array(self.weight_matrix.sum(axis=1)).flatten()
+        # Set the minimum mdtol to be slightly higher than 0 to account for rounding
+        # errors.
+        mdtol = max(mdtol, 1e-8)
         tgt_mask = weight_sums >= 1 - mdtol
         masked_weight_sums = weight_sums * tgt_mask.astype(int)
         normalisations = np.where(masked_weight_sums == 0, 0, 1 / masked_weight_sums)
