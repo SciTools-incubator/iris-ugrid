@@ -38,7 +38,8 @@ class MeshInfo:
         nodeOwner = np.zeros([num_node])  # regridding currently serial
         elemId = np.array(range(self.esi, self.esi + num_elem))
         elemType = self.fnc.count(axis=1)
-        elemConn = self.fnc.compressed()
+        # Experiments seem to indicate that ESMF is using 0 indexing here
+        elemConn = self.fnc.compressed() - self.nsi
         result = (
             num_node,
             num_elem,

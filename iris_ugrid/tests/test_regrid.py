@@ -60,8 +60,8 @@ def test_make_mesh():
     mesh = MeshInfo(coords, nodes, 0, 0)
     mesh.make_esmf_field()
 
-    nodes += 1
-    mesh = MeshInfo(coords, nodes, 1, 0)
+    one_indexed_nodes = nodes + 1
+    mesh = MeshInfo(coords, one_indexed_nodes, 1, 0)
     mesh.make_esmf_field()
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
@@ -70,7 +70,7 @@ def test_make_mesh():
 
 def test_make_grid():
     lon, lat, lon_bounds, lat_bounds = make_small_grid()
-    grid = GridInfo(lon, lat, lon_bounds, lat_bounds, 0, 0)
+    grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
     grid.make_esmf_field()
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
