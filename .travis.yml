@@ -90,4 +90,4 @@ install:
 
 script:
 
-  - pytest -v ./iris_ugrid/tests
+  - pytest -v --black ./iris_ugrid/tests
