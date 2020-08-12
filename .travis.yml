@@ -89,10 +89,8 @@ install:
 
 
 script:
-  - export INSTALL_DIR=$(pwd)
-
   - >
     echo $(black --version);
-    black --check ${INSTALL_DIR};
+    black --check .;
 
   - pytest -v ./iris_ugrid/tests
