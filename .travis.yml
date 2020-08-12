@@ -61,10 +61,6 @@ install:
 
   # Conda-install our own additional dependencies.
   - conda install --file requirements/conda_requirements.txt
-  # If conda's pytest-black version is too old: use pip to update.
-  # TODO: remove this when conda version is updated.
-  - conda install pip
-  - pip install "pytest-black>=0.3.9"
 
   # Output environment debug info
   - >
@@ -94,4 +90,8 @@ install:
 
 script:
 
-  - pytest -v --black ./iris_ugrid/tests
+  - >
+    - echo $(black --version);
+    - black --check $(INSTALL_DIR);
+
+  - pytest -v ./iris_ugrid/tests
