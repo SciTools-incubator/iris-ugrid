@@ -14,7 +14,6 @@ TODO: remove this when we have other more sensible tests.
 def test_iris_installation():
     # Check that iris cf loader includes 'exclude' functionality.
     # Import a ugrid-specific test, that ought to exist on the branch.
-    from iris.tests.unit.fileformats.cf.test_CFReader \
-        import Test_exclude_vars
+    from iris.tests.unit.fileformats.cf.test_CFReader import Test_exclude_vars
 
-    assert hasattr(Test_exclude_vars, 'test_exclude_vars')
+    assert hasattr(Test_exclude_vars, "test_exclude_vars")

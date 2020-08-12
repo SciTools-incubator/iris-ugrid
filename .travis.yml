@@ -60,7 +60,7 @@ install:
     conda install --quiet -n ${ENV_NAME} --file ${CONDA_REQS_FILE};
 
   # Conda-install our own additional dependencies.
-  - conda install --file conda_requirements.txt
+  - conda install --file requirements/conda_requirements.txt
 
   # Output environment debug info
   - >
