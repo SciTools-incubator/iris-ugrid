@@ -92,6 +92,6 @@ script:
 
   - >
     echo $(black --version);
-    black --check $(INSTALL_DIR);
+    black --check ${INSTALL_DIR};
 
   - pytest -v ./iris_ugrid/tests
