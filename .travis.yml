@@ -89,6 +89,7 @@ install:
 
 
 script:
+  - export INSTALL_DIR=$(pwd)
 
   - >
     echo $(black --version);
