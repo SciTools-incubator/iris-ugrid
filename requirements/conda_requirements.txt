@@ -1,3 +1,3 @@
-black
 gridded
+pytest
 pytest-black
