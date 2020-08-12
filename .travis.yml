@@ -91,7 +91,7 @@ install:
 script:
 
   - >
-    - echo $(black --version);
-    - black --check $(INSTALL_DIR);
+    echo $(black --version);
+    black --check $(INSTALL_DIR);
 
   - pytest -v ./iris_ugrid/tests
