@@ -5,8 +5,12 @@
 #   https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
 
 ignore =
+    # E203: whitespace before ':'
+    E203,
     # E402: module level imports at top of file
     E402,
+    # E501: line too long
+    E501,
     # W503: line break before binary operator
     W503,
     # W504: line break after binary operator
