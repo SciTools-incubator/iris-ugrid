@@ -39,8 +39,8 @@ class MeshInfo:
             node_coords[:,1] describes the latitides in degrees
         * face_node_connectivity
             A numpy masked array describing the face node connectivity of the
-            mesh. face_node_connectivity[i] describes which nodes are connected
-            to the i'th face.
+            mesh. The unmasked points of face_node_connectivity[i] describe
+            which nodes are connected to the i'th face.
         * node_start_index
             An integer describing which index is considered the initial index
             by face_node_connectivity. UGRID supports both 0 based and 1 based
@@ -318,6 +318,28 @@ def _weights_dict_to_sparse_array(weights, shape, index_offsets):
 
 class Regridder:
     def __init__(self, src, tgt, precomputed_weights=None):
+        """
+        Creates a regridder designed to regrid data from a specified
+        source mesh/grid to a specified target mesh/grid.
+
+        Args:
+
+        * src
+            A MeshInfo or GridInfo oject describing the source mesh/grid.
+            Data supplied to this regridder should be in a numpy array
+            whose shape is compatible with src.
+        * tgt
+            A MeshInfo or GridInfo oject describing the target mesh/grid.
+            Data output by this regridder will be a numpy array whose
+            shape is compatible with tgt.
+
+        Kwargs:
+
+        * precomputed_weights
+            None or a scipy.sparse matrix. If None, ESMF will be used to
+            calculate regridding weights. Otherwise, ESMF will be bypassed
+            and precomputed_weights will be used as the regridding weights.
+        """
         self.src = src
         self.tgt = tgt
 
@@ -346,6 +368,29 @@ class Regridder:
             self.weight_matrix = precomputed_weights
 
     def regrid(self, src_array, mdtol=1):
+        """
+        Perform regridding on an array of data.
+
+        Args:
+
+        * src_array
+            A numpy array whose shape is compatible with self.src
+
+        Kwargs:
+
+        * mdtol
+            A number between 0 and 1 describing the missing data tolerance.
+            Depending on the value of mdtol, if an element in the target mesh/grid
+            is not sufficiently covered by elements of the source mesh/grid, then
+            the corresponding data point will be masked. An mdtol of 1 means that
+            only target elements which are completely uncovered will be masked,
+            an mdtol of 0 means that only target elements which are completely
+            covered will be unmasked and an mdtol of 0.5 means that target elements
+            whose area is at least half uncovered by source elements will be masked.
+
+        Returns:
+            A numpy array whose shape is compatible with self.tgt.
+        """
         # A rudimentary filter is applied to mask data which is mapped from an
         # insufficiently large source. This currently only accounts for discrepancies
         # between the source and target grid/mesh geometries and does not account for
