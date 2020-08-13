@@ -65,11 +65,11 @@ def expected_weights():
 
 def test_make_mesh():
     coords, nodes = make_small_mesh()
-    mesh = MeshInfo(coords, nodes, 0, 0)
+    mesh = MeshInfo(coords, nodes, 0)
     mesh.make_esmf_field()
 
     one_indexed_nodes = nodes + 1
-    mesh = MeshInfo(coords, one_indexed_nodes, 1, 0)
+    mesh = MeshInfo(coords, one_indexed_nodes, 1)
     mesh.make_esmf_field()
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
@@ -87,7 +87,7 @@ def test_make_grid():
 
 def test_regrid_setup():
     coords, nodes = make_small_mesh()
-    mesh = MeshInfo(coords, nodes, 0, 0)
+    mesh = MeshInfo(coords, nodes, 0)
 
     lon, lat, lon_bounds, lat_bounds = make_small_grid()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
@@ -102,7 +102,7 @@ def test_regrid_setup():
 
 def test_regrid_perform():
     coords, nodes = make_small_mesh()
-    mesh = MeshInfo(coords, nodes, 0, 0)
+    mesh = MeshInfo(coords, nodes, 0)
 
     lon, lat, lon_bounds, lat_bounds = make_small_grid()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
