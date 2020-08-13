@@ -73,7 +73,9 @@ class MeshInfo:
         )
 
         emesh.add_nodes(num_node, nodeId, nodeCoord, nodeOwner)
-        emesh.add_elements(num_elem, elemId, elemType, elemConn, element_area=areas)
+        emesh.add_elements(
+            num_elem, elemId, elemType, elemConn, element_area=areas
+        )
         return emesh
 
     def make_esmf_field(self):
@@ -129,8 +131,12 @@ class GridInfo:
         centerlons, centerlats = np.meshgrid(self.lons, self.lats)
         cornerlons, cornerlats = np.meshgrid(adjustedlonbounds, self.latbounds)
 
-        truecenters = ccrs.Geodetic().transform_points(self.crs, centerlons, centerlats)
-        truecorners = ccrs.Geodetic().transform_points(self.crs, cornerlons, cornerlats)
+        truecenters = ccrs.Geodetic().transform_points(
+            self.crs, centerlons, centerlats
+        )
+        truecorners = ccrs.Geodetic().transform_points(
+            self.crs, cornerlons, cornerlats
+        )
 
         # The following note in xESMF suggests that the arrays passed to ESMPy ought to
         # be fortran ordered:
@@ -184,7 +190,9 @@ class GridInfo:
         # grid_center_y[:] = truecenterlats
 
         if areas is not None:
-            grid.add_item(ESMF.GridItem.AREA, staggerloc=ESMF.StaggerLoc.CENTER)
+            grid.add_item(
+                ESMF.GridItem.AREA, staggerloc=ESMF.StaggerLoc.CENTER
+            )
             grid_areas = grid.get_item(
                 ESMF.GridItem.AREA, staggerloc=ESMF.StaggerLoc.CENTER
             )
@@ -268,7 +276,8 @@ class Regridder:
                 msg = "Expected precomputed weights to have shape {}, got shape {} instead."
                 raise ValueError(
                     msg.format(
-                        (self.tgt.size(), self.src.size()), precomputed_weights.shape
+                        (self.tgt.size(), self.src.size()),
+                        precomputed_weights.shape,
                     )
                 )
             self.weight_matrix = precomputed_weights
@@ -289,8 +298,12 @@ class Regridder:
         mdtol = max(mdtol, 1e-8)
         tgt_mask = weight_sums >= 1 - mdtol
         masked_weight_sums = weight_sums * tgt_mask.astype(int)
-        normalisations = np.where(masked_weight_sums == 0, 0, 1 / masked_weight_sums)
-        normalisations = ma.array(normalisations, mask=np.logical_not(tgt_mask))
+        normalisations = np.where(
+            masked_weight_sums == 0, 0, 1 / masked_weight_sums
+        )
+        normalisations = ma.array(
+            normalisations, mask=np.logical_not(tgt_mask)
+        )
 
         flat_src = self.src._flatten_array(src_array)
         flat_tgt = self.weight_matrix * flat_src

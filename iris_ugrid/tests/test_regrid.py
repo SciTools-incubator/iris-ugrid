@@ -16,7 +16,8 @@ import scipy.sparse
 def make_small_mesh():
     ugrid_coords = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 2]])
     ugrid_elem_nodes = ma.array(
-        [[0, 2, 3, -1], [3, 0, 1, 4]], mask=np.array([[0, 0, 0, 1], [0, 0, 0, 0]])
+        [[0, 2, 3, -1], [3, 0, 1, 4]],
+        mask=np.array([[0, 0, 0, 1], [0, 0, 0, 0]]),
     )
     return ugrid_coords, ugrid_elem_nodes
 
@@ -29,7 +30,12 @@ def make_small_grid():
 
     small_grid_lon_bounds = np.array(range(small_x + 1)) / (small_x + 1)
     small_grid_lat_bounds = np.array(range(small_y + 1)) * 2 / (small_y + 1)
-    return small_grid_lon, small_grid_lat, small_grid_lon_bounds, small_grid_lat_bounds
+    return (
+        small_grid_lon,
+        small_grid_lat,
+        small_grid_lon_bounds,
+        small_grid_lat_bounds,
+    )
 
 
 def expected_weights():
@@ -51,7 +57,9 @@ def expected_weights():
 
     shape = (6, 2)
 
-    weights = scipy.sparse.csr_matrix((weight_list, (rows, columns)), shape=shape)
+    weights = scipy.sparse.csr_matrix(
+        (weight_list, (rows, columns)), shape=shape
+    )
     return weights
 
 
@@ -102,7 +110,10 @@ def test_regrid_perform():
     rg = Regridder(mesh, grid, precomputed_weights=expected_weights())
 
     exprected = ma.array(
-        [[2.333383638468529, 2.0, 2.0], [2.9167189586204008, 2.083393166304049, 2.0]]
+        [
+            [2.333383638468529, 2.0, 2.0],
+            [2.9167189586204008, 2.083393166304049, 2.0],
+        ]
     )
     result = rg.regrid([3, 2])
     assert np.allclose(exprected, result)
