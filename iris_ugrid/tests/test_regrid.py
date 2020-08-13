@@ -13,16 +13,16 @@ from iris_ugrid.regrid import MeshInfo, GridInfo, Regridder
 import scipy.sparse
 
 
-def make_small_mesh():
-    ugrid_coords = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 2]])
-    ugrid_elem_nodes = ma.array(
+def make_small_mesh_args():
+    ugrid_node_coords = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 2]])
+    ugrid_face_node_connectivity = ma.array(
         [[0, 2, 3, -1], [3, 0, 1, 4]],
         mask=np.array([[0, 0, 0, 1], [0, 0, 0, 0]]),
     )
-    return ugrid_coords, ugrid_elem_nodes
+    return ugrid_node_coords, ugrid_face_node_connectivity
 
 
-def make_small_grid():
+def make_small_grid_args():
     small_x = 2
     small_y = 3
     small_grid_lon = np.array(range(small_x)) / (small_x + 1)
@@ -64,32 +64,77 @@ def expected_weights():
 
 
 def test_make_mesh():
-    coords, nodes = make_small_mesh()
+    coords, nodes = make_small_mesh_args()
     mesh = MeshInfo(coords, nodes, 0)
-    mesh.make_esmf_field()
+    ESMF_mesh_0 = mesh.make_esmf_field()
+
+    expected_repr = """Field:
+    name = None
+    type = <TypeKind.R8: 6>
+    rank = 1
+    extra dimensions = 0
+    staggerloc = 1
+    lower bounds = array([0], dtype=int32)
+    upper bounds = array([2], dtype=int32)
+    extra bounds = None
+    data = array([0., 0.])
+    grid = 
+Mesh:
+    rank = 1
+    size = [5, 2]
+    size_owned = [5, 2]
+    coords = [[array([0., 0., 1., 1., 1.]), array([0., 1., 0., 1., 2.])], [None, None]]
+
+)"""
 
     one_indexed_nodes = nodes + 1
     mesh = MeshInfo(coords, one_indexed_nodes, 1)
-    mesh.make_esmf_field()
+    ESMF_mesh_1 = mesh.make_esmf_field()
+
+    assert ESMF_mesh_0.__repr__() == ESMF_mesh_1.__repr__() == expected_repr
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
     #  how such objects ought to behave
 
 
 def test_make_grid():
-    lon, lat, lon_bounds, lat_bounds = make_small_grid()
+    lon, lat, lon_bounds, lat_bounds = make_small_grid_args()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
-    grid.make_esmf_field()
+    ESMF_grid = grid.make_esmf_field()
+    expected_repr = """Field:
+    name = None
+    type = <TypeKind.R8: 6>
+    rank = 2
+    extra dimensions = 0
+    staggerloc = <StaggerLoc.CENTER: 0>
+    lower bounds = array([0, 0], dtype=int32)
+    upper bounds = array([3, 2], dtype=int32)
+    extra bounds = None
+    data = array([[0.00000000e+000, 0.00000000e+000],
+       [4.24399158e-314, 0.00000000e+000],
+       [0.00000000e+000, 0.00000000e+000]])
+    grid = 
+Grid:
+    type = <TypeKind.R8: 6>    areatype = <TypeKind.R8: 6>    rank = 2    num_peri_dims = 0    periodic_dim = None    pole_dim = None    coord_sys = None    staggerloc = [False, False, False, True]    lower bounds = [None, None, None, array([0, 0], dtype=int32)]    upper bounds = [None, None, None, array([4, 3], dtype=int32)]    coords = [[None, None], [None, None], [None, None], [array([[0.        , 0.33333333, 0.66666667],
+       [0.        , 0.33333333, 0.66666667],
+       [0.        , 0.33333333, 0.66666667],
+       [0.        , 0.33333333, 0.66666667]]), array([[0. , 0. , 0. ],
+       [0.5, 0.5, 0.5],
+       [1. , 1. , 1. ],
+       [1.5, 1.5, 1.5]])]]    mask = [None, None, None, None]    area = [None, None, None, None]
+)"""
+
+    assert ESMF_grid.__repr__() == expected_repr
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
     #  how such objects ought to behave
 
 
-def test_regrid_setup():
-    coords, nodes = make_small_mesh()
-    mesh = MeshInfo(coords, nodes, 0)
+def test_Regridder_init():
+    node_coords, face_node_connectivity = make_small_mesh_args()
+    mesh = MeshInfo(node_coords, face_node_connectivity, 0)
 
-    lon, lat, lon_bounds, lat_bounds = make_small_grid()
+    lon, lat, lon_bounds, lat_bounds = make_small_grid_args()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
 
     rg = Regridder(mesh, grid)
@@ -100,11 +145,11 @@ def test_regrid_setup():
     assert np.allclose(result.toarray(), expected.toarray())
 
 
-def test_regrid_perform():
-    coords, nodes = make_small_mesh()
+def test_Regridder_regrid():
+    coords, nodes = make_small_mesh_args()
     mesh = MeshInfo(coords, nodes, 0)
 
-    lon, lat, lon_bounds, lat_bounds = make_small_grid()
+    lon, lat, lon_bounds, lat_bounds = make_small_grid_args()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
 
     rg = Regridder(mesh, grid, precomputed_weights=expected_weights())
