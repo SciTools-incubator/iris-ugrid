@@ -33,31 +33,26 @@ class MeshInfo:
 
         Args:
 
-
         * node_coords
             An Nx2 numpy array describing the location of the nodes of the mesh.
             node_coords[:,0] describes the longitudes in degrees and
             node_coords[:,1] describes the latitides in degrees
-
         * face_node_connectivity
             A numpy masked array describing the face node connectivity of the
             mesh. face_node_connectivity[i] describes which nodes are connected
             to the i'th face.
-
         * node_start_index
             An integer describing which index is considered the initial index
             by face_node_connectivity. UGRID supports both 0 based and 1 based
             indexing, so both must be accounted for here
 
-        kwargs:
-
+        Kwargs:
 
         * elem_start_index
             An integer describing what index should be considered by ESMF to be
             the start index for describing its elements. This makes no
             difference to the regridding calculation and will only affect the
             intermediate ESMF objects, should the user need access to them.
-
         * areas
             either None or a numpy array describing the areas associated with
             each face. If None, then ESMF will use its own calculated areas.
@@ -157,32 +152,25 @@ class GridInfo:
 
         Args:
 
-
         * lons
             A numpy array describing the longitudes of the grid points.
-
         * lats
             A numpy array describing the latitudes of the grid points.
-
         * lonbounds
             A numpy array describing the longitude bounds of the grid.
             Should have length one greater than lons
-
         * latbounds
             A numpy array describing the latitude bounds of the grid.
             Should have length one greater than lats
 
         Kwargs:
 
-
         * crs
             A cartopy.crs projection describing how to interpret the above
             arguments. Defaults to Geodetic().
-
         * circular
-          A boolean value describing if the final longitude bounds should
-          be considered contiguous with the first. Defaults to False.
-
+            A boolean value describing if the final longitude bounds should
+            be considered contiguous with the first. Defaults to False.
         * areas
             either None or a numpy array describing the areas associated with
             each face. If None, then ESMF will use its own calculated areas.
