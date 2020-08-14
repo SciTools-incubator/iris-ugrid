@@ -1,4 +1,4 @@
 black=19.10b0
-esmpy
+esmpy<=8.0.1
 gridded
 pytest

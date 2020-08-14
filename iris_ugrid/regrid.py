@@ -17,6 +17,10 @@ class MeshInfo:
     """
     This class holds information about Meshes in a form similar to UGRID.
     It contains methods for translating this information into ESMF objects.
+    In particular, there are methods for representing as an ESMF Mesh and
+    as an ESMF Field containing that Mesh. This ESMF Field is designed to
+    contain enough information for area weighted regridding and may be
+    inappropriate for other ESMF regridding schemes.
     """
 
     def __init__(
@@ -42,9 +46,11 @@ class MeshInfo:
             mesh. The unmasked points of face_node_connectivity[i] describe
             which nodes are connected to the i'th face.
         * node_start_index
-            An integer describing which index is considered the initial index
-            by face_node_connectivity. UGRID supports both 0 based and 1 based
-            indexing, so both must be accounted for here
+            An integer the value which, appearing in the face_node_connectivity
+            array, indicates the first node in the node_coords array.
+            UGRID supports both 0 based and 1 based indexing, so both must be
+            accounted for here:
+            https://ugrid-conventions.github.io/ugrid-conventions/#zero-or-one
 
         Kwargs:
 
@@ -133,9 +139,17 @@ class MeshInfo:
 
 class GridInfo:
     """
-    This class holds information about lat-lon type grids.
+    This class holds information about lat-lon type grids. That is, grids
+    defined by lists of latitude and longitude values for points/bounds
+    (with respect to some coordinate reference system i.e. rotated pole).
     It contains methods for translating this information into ESMF objects.
+    In particular, there are methods for representing as an ESMF Grid and
+    as an ESMF Field containing that Grid. This ESMF Field is designed to
+    contain enough information for area weighted regridding and may be
+    inappropriate for other ESMF regridding schemes.
     """
+
+    # TODO: Edit GridInfo so that it is able to handle 2D lat/lon arrays.
 
     def __init__(
         self,
@@ -143,7 +157,7 @@ class GridInfo:
         lats,
         lonbounds,
         latbounds,
-        crs=ccrs.Geodetic(),
+        crs=None,
         circular=False,
         areas=None,
     ):
@@ -153,21 +167,23 @@ class GridInfo:
         Args:
 
         * lons
-            A numpy array describing the longitudes of the grid points.
+            A 1D numpy array or list describing the longitudes of the
+            grid points.
         * lats
-            A numpy array describing the latitudes of the grid points.
+            A 1D numpy array or list describing the latitudes of the
+            grid points.
         * lonbounds
-            A numpy array describing the longitude bounds of the grid.
-            Should have length one greater than lons
+            A 1D numpy array or list describing the longitude bounds of
+            the grid. Should have length one greater than lons
         * latbounds
-            A numpy array describing the latitude bounds of the grid.
-            Should have length one greater than lats
+            A 1D numpy array or list describing the latitude bounds of
+            the grid. Should have length one greater than lats
 
         Kwargs:
 
         * crs
-            A cartopy.crs projection describing how to interpret the above
-            arguments. Defaults to Geodetic().
+            None or a cartopy.crs projection describing how to interpret the
+            above arguments. If None, defaults to Geodetic().
         * circular
             A boolean value describing if the final longitude bounds should
             be considered contiguous with the first. Defaults to False.
@@ -179,7 +195,10 @@ class GridInfo:
         self.lats = lats
         self.lonbounds = lonbounds
         self.latbounds = latbounds
-        self.crs = crs
+        if crs is None:
+            self.crs = ccrs.Geodetic()
+        else:
+            self.crs = crs
         self.circular = circular
         self.areas = areas
 
@@ -234,9 +253,9 @@ class GridInfo:
         ) = info
 
         if circular:
-            grid = ESMF.Grid(size, num_peri_dims=1)
+            grid = ESMF.Grid(size, pole_kind=[1, 1], num_peri_dims=1)
         else:
-            grid = ESMF.Grid(size)
+            grid = ESMF.Grid(size, pole_kind=[1, 1])
 
         grid.add_coords(staggerloc=ESMF.StaggerLoc.CORNER)
         grid_corner_x = grid.get_coords(0, staggerloc=ESMF.StaggerLoc.CORNER)
