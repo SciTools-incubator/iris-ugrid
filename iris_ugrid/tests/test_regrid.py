@@ -71,7 +71,8 @@ def test_make_mesh():
     esmf_mesh_0.data[:] = 0
 
     relative_path = os.path.join("results", "test_regrid", "small_mesh.txt")
-    with open(relative_path) as file:
+    abs_path = os.path.join(os.path.dirname(__file__), relative_path)
+    with open(abs_path) as file:
         expected_repr = file.read()
 
     one_indexed_nodes = nodes + 1
@@ -92,7 +93,8 @@ def test_make_grid():
     esmf_grid.data[:] = 0
 
     relative_path = os.path.join("results", "test_regrid", "small_grid.txt")
-    with open(relative_path) as file:
+    abs_path = os.path.join(os.path.dirname(__file__), relative_path)
+    with open(abs_path) as file:
         expected_repr = file.read()
 
     assert esmf_grid.__repr__() == expected_repr
