@@ -67,6 +67,7 @@ def test_make_mesh():
     coords, nodes = make_small_mesh_args()
     mesh = MeshInfo(coords, nodes, 0)
     esmf_mesh_0 = mesh.make_esmf_field()
+    esmf_mesh_0.data[:] = 0
 
     expected_repr = """Field:
     name = None
@@ -90,6 +91,7 @@ Mesh:
     one_indexed_nodes = nodes + 1
     mesh = MeshInfo(coords, one_indexed_nodes, 1)
     esmf_mesh_1 = mesh.make_esmf_field()
+    esmf_mesh_1.data[:] = 0
 
     assert esmf_mesh_0.__repr__() == esmf_mesh_1.__repr__() == expected_repr
 
@@ -101,6 +103,7 @@ def test_make_grid():
     lon, lat, lon_bounds, lat_bounds = make_small_grid_args()
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
     esmf_grid = grid.make_esmf_field()
+    esmf_grid.data[:] = 0
     expected_repr = """Field:
     name = None
     type = <TypeKind.R8: 6>
@@ -110,9 +113,9 @@ def test_make_grid():
     lower bounds = array([0, 0], dtype=int32)
     upper bounds = array([3, 2], dtype=int32)
     extra bounds = None
-    data = array([[0.00000000e+000, 0.00000000e+000],
-       [4.24399158e-314, 0.00000000e+000],
-       [0.00000000e+000, 0.00000000e+000]])
+    data = array([[0., 0.],
+       [0., 0.],
+       [0., 0.]])
     grid = 
 Grid:
     type = <TypeKind.R8: 6>    areatype = <TypeKind.R8: 6>    rank = 2    num_peri_dims = 0    periodic_dim = None    pole_dim = None    pole_kind = array([1, 1], dtype=int32)    coord_sys = None    staggerloc = [False, False, False, True]    lower bounds = [None, None, None, array([0, 0], dtype=int32)]    upper bounds = [None, None, None, array([4, 3], dtype=int32)]    coords = [[None, None], [None, None], [None, None], [array([[0.        , 0.33333333, 0.66666667],
@@ -123,7 +126,6 @@ Grid:
        [1. , 1. , 1. ],
        [1.5, 1.5, 1.5]])]]    mask = [None, None, None, None]    area = [None, None, None, None]
 )"""
-    print(esmf_grid.__repr__())
     assert esmf_grid.__repr__() == expected_repr
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
