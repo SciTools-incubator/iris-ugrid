@@ -69,24 +69,8 @@ def test_make_mesh():
     esmf_mesh_0 = mesh.make_esmf_field()
     esmf_mesh_0.data[:] = 0
 
-    expected_repr = """Field:
-    name = None
-    type = <TypeKind.R8: 6>
-    rank = 1
-    extra dimensions = 0
-    staggerloc = 1
-    lower bounds = array([0], dtype=int32)
-    upper bounds = array([2], dtype=int32)
-    extra bounds = None
-    data = array([0., 0.])
-    grid = 
-Mesh:
-    rank = 1
-    size = [5, 2]
-    size_owned = [5, 2]
-    coords = [[array([0., 0., 1., 1., 1.]), array([0., 1., 0., 1., 2.])], [None, None]]
-
-)"""
+    with open("results/test_regrid/small_mesh.txt") as file:
+        expected_repr = file.read()
 
     one_indexed_nodes = nodes + 1
     mesh = MeshInfo(coords, one_indexed_nodes, 1)
@@ -104,28 +88,9 @@ def test_make_grid():
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
     esmf_grid = grid.make_esmf_field()
     esmf_grid.data[:] = 0
-    expected_repr = """Field:
-    name = None
-    type = <TypeKind.R8: 6>
-    rank = 2
-    extra dimensions = 0
-    staggerloc = <StaggerLoc.CENTER: 0>
-    lower bounds = array([0, 0], dtype=int32)
-    upper bounds = array([3, 2], dtype=int32)
-    extra bounds = None
-    data = array([[0., 0.],
-       [0., 0.],
-       [0., 0.]])
-    grid = 
-Grid:
-    type = <TypeKind.R8: 6>    areatype = <TypeKind.R8: 6>    rank = 2    num_peri_dims = 0    periodic_dim = None    pole_dim = None    pole_kind = array([1, 1], dtype=int32)    coord_sys = None    staggerloc = [False, False, False, True]    lower bounds = [None, None, None, array([0, 0], dtype=int32)]    upper bounds = [None, None, None, array([4, 3], dtype=int32)]    coords = [[None, None], [None, None], [None, None], [array([[0.        , 0.33333333, 0.66666667],
-       [0.        , 0.33333333, 0.66666667],
-       [0.        , 0.33333333, 0.66666667],
-       [0.        , 0.33333333, 0.66666667]]), array([[0. , 0. , 0. ],
-       [0.5, 0.5, 0.5],
-       [1. , 1. , 1. ],
-       [1.5, 1.5, 1.5]])]]    mask = [None, None, None, None]    area = [None, None, None, None]
-)"""
+    with open("results/test_regrid/small_grid.txt") as file:
+        expected_repr = file.read()
+
     assert esmf_grid.__repr__() == expected_repr
 
     # TODO: make sure this ESMF object behaves as expected, requires understanding
