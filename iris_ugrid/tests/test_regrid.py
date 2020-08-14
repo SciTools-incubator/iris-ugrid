@@ -7,6 +7,7 @@
 Test ESMF regridding.
 """
 
+import os
 import numpy as np
 from numpy import ma
 from iris_ugrid.regrid import MeshInfo, GridInfo, Regridder
@@ -69,7 +70,8 @@ def test_make_mesh():
     esmf_mesh_0 = mesh.make_esmf_field()
     esmf_mesh_0.data[:] = 0
 
-    with open("results/test_regrid/small_mesh.txt") as file:
+    relative_path = os.path.join("results", "test_regrid", "small_mesh.txt")
+    with open(relative_path) as file:
         expected_repr = file.read()
 
     one_indexed_nodes = nodes + 1
@@ -88,7 +90,9 @@ def test_make_grid():
     grid = GridInfo(lon, lat, lon_bounds, lat_bounds)
     esmf_grid = grid.make_esmf_field()
     esmf_grid.data[:] = 0
-    with open("results/test_regrid/small_grid.txt") as file:
+
+    relative_path = os.path.join("results", "test_regrid", "small_grid.txt")
+    with open(relative_path) as file:
         expected_repr = file.read()
 
     assert esmf_grid.__repr__() == expected_repr
@@ -142,3 +146,5 @@ def test_Regridder_regrid():
 # TODO: Add testing for regridding with user provided weights, a better
 #  understanding of how weights affect ESMF regridding is required
 #  before deciding which results are appropriate
+
+test_make_mesh()
