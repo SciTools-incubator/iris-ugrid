@@ -146,5 +146,3 @@ def test_Regridder_regrid():
 # TODO: Add testing for regridding with user provided weights, a better
 #  understanding of how weights affect ESMF regridding is required
 #  before deciding which results are appropriate
-
-test_make_mesh()
