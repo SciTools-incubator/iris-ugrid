@@ -203,7 +203,8 @@ class GridInfo:
         self.areas = areas
 
     def _as_esmf_info(self):
-        size = np.array([len(self.lats), len(self.lons)])
+        shape = np.array([len(self.lats), len(self.lons)])
+        # shape = np.array([len(self.lons), len(self.lats)])
 
         if self.circular:
             adjustedlonbounds = self.lonbounds[:-1]
@@ -230,7 +231,7 @@ class GridInfo:
         truecornerlats = np.asfortranarray(truecorners[..., 1])
 
         info = (
-            size,
+            shape,
             truecenterlons,
             truecenterlats,
             truecornerlons,
@@ -243,7 +244,7 @@ class GridInfo:
     def _make_esmf_grid(self):
         info = self._as_esmf_info()
         (
-            size,
+            shape,
             truecenterlons,
             truecenterlats,
             truecornerlons,
@@ -253,9 +254,15 @@ class GridInfo:
         ) = info
 
         if circular:
-            grid = ESMF.Grid(size, pole_kind=[1, 1], num_peri_dims=1)
+            grid = ESMF.Grid(
+                shape,
+                pole_kind=[1, 1],
+                num_peri_dims=1,
+                periodic_dim=1,
+                pole_dim=0,
+            )
         else:
-            grid = ESMF.Grid(size, pole_kind=[1, 1])
+            grid = ESMF.Grid(shape, pole_kind=[1, 1])
 
         grid.add_coords(staggerloc=ESMF.StaggerLoc.CORNER)
         grid_corner_x = grid.get_coords(0, staggerloc=ESMF.StaggerLoc.CORNER)
