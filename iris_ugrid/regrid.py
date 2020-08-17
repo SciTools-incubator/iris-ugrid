@@ -204,7 +204,6 @@ class GridInfo:
 
     def _as_esmf_info(self):
         shape = np.array([len(self.lats), len(self.lons)])
-        # shape = np.array([len(self.lons), len(self.lats)])
 
         if self.circular:
             adjustedlonbounds = self.lonbounds[:-1]
