@@ -82,9 +82,6 @@ def test_make_mesh():
 
     assert esmf_mesh_0.__repr__() == esmf_mesh_1.__repr__() == expected_repr
 
-    # TODO: make sure this ESMF object behaves as expected, requires understanding
-    #  how such objects ought to behave
-
 
 def test_make_grid():
     lon, lat, lon_bounds, lat_bounds = make_small_grid_args()
@@ -98,9 +95,6 @@ def test_make_grid():
         expected_repr = file.read()
 
     assert esmf_grid.__repr__() == expected_repr
-
-    # TODO: make sure this ESMF object behaves as expected, requires understanding
-    #  how such objects ought to behave
 
 
 def test_Regridder_init():
