@@ -170,7 +170,9 @@ class UGridCFReader:
 
         # Create a CFReader object which skips the UGRID-related variables.
         kwargs["exclude_var_names"] = exclude_vars
-        self.cfreader = iris.fileformats.cf.CFReader(self.dataset, *args, **kwargs)
+        self.cfreader = iris.fileformats.cf.CFReader(
+            self.dataset, *args, **kwargs
+        )
 
     def complete_unstructured_cube(self, cube):
         """
@@ -228,7 +230,11 @@ def load_cubes(filenames, callback=None):
         # We must return the inner, actual CFReader object..
         inner_cf_reader = ugrid_reader.cfreader
         # .. but we also create on it a 'cube_completion' method, which the loader operation will call for us.
-        inner_cf_reader.cube_completion_adjust = ugrid_reader.complete_unstructured_cube
+        inner_cf_reader.cube_completion_adjust = (
+            ugrid_reader.complete_unstructured_cube
+        )
         return inner_cf_reader
 
-    return iris.fileformats.netcdf.load_cubes(filenames, callback=callback, create_reader=create_ugrid_reader)
+    return iris.fileformats.netcdf.load_cubes(
+        filenames, callback=callback, create_reader=create_ugrid_reader
+    )
