@@ -173,8 +173,9 @@ class UGridCFReader(CFReader):
 
         # Initialise the main CF analysis operation, but make it ignore the
         # UGRID-specific variables.
-        super().__init__(self.dataset, *args,
-                         exclude_var_names=exclude_vars, **kwargs)
+        super().__init__(
+            self.dataset, *args, exclude_var_names=exclude_vars, **kwargs
+        )
 
     def cube_completion_adjust(self, cube):
         """
