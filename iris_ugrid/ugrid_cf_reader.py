@@ -18,6 +18,7 @@ from gridded.pyugrid.read_netcdf import (
 )
 
 import iris.fileformats.cf
+from iris.fileformats.cf import CFReader
 import iris.fileformats.netcdf
 
 
@@ -100,17 +101,19 @@ class CubeUgrid(
         return ".".join([self.grid.mesh_name, self.mesh_location])
 
 
-class UGridCFReader:
+class UGridCFReader(CFReader):
     """
-    A CFReader extension to add UGRID information to netcdf cube loading.
-    Identifies UGRID-specific parts of a netcdf file, providing:
-    * `self.cfreader` : a CFReader object to interpret the CF data from the
-      file for cube creation, while ignoring the UGRID mesh data.
-    * `self.complete_ugrid_cube(cube)` a call to add the relevant UGRID
-      information to a cube created from the cfreader data.
-    This allows us to decouple UGRID from CF support with minimal changes to
-    the existing `iris.fileformats.netcdf` code, which is intimately coupled to
-    both the CFReader class and the netCDF4 file interface.
+    A specialised CFReader which inspects the file for UGRID mesh information
+    in addition to the usual netcdf-CF cube loading analysis.
+
+    Identifies and analyses the UGRID-specific parts of a netcdf file.
+
+    Uses the 'exclude_var_names' key in the parent constructor call, to omit
+    ugrid-specific data variables from the CF analysis.
+
+    Provides a 'cube_completion_adjust' method, to attach mesh information to
+    those result cubes which map to a ugrid mesh.
+
     """
 
     def __init__(self, filename, *args, **kwargs):
@@ -168,23 +171,27 @@ class UGridCFReader:
                 meshdims_map[nodes_dim_name] = (mesh, "node")
         self.meshdims_map = meshdims_map
 
-        # Create a CFReader object which skips the UGRID-related variables.
-        kwargs["exclude_var_names"] = exclude_vars
-        self.cfreader = iris.fileformats.cf.CFReader(
-            self.dataset, *args, **kwargs
+        # Initialise the main CF analysis operation, but make it ignore the
+        # UGRID-specific variables.
+        super().__init__(
+            self.dataset, *args, exclude_var_names=exclude_vars, **kwargs
         )
 
-    def complete_unstructured_cube(self, cube):
+    def cube_completion_adjust(self, cube):
         """
-        Cube post-processing hook called by :func:`iris.fileformats.netcdf.load_cubes`, to add the unstructured info
-        onto a cube newly created by the `self.cfreader`.
+        Cube post-processing method to add details of the mesh to any newly
+        created cubes which have a mesh dimension.
 
-        Add the ".ugrid" property to a cube loaded with the `self.cfreader`.
-        We identify the unstructured-grid dimension of the cube (if any), and
-        attach a suitable CubeUgrid object, linking the cube mesh dimension to
-        an element-type (aka "mesh_location") of a mesh.
+        Called by a 'cube post-modify hook' in
+        :func:`iris.fileformats.netcdf.load_cubes`.
+
+        Adds the ".ugrid" property to cubes created by the CF reader, which
+        links the cube mesh dimension to a specific mesh and element-type (aka
+        "mesh_location").
+
         """
-        # Set a 'cube.ugrid' property.
+        # Identify the unstructured-grid dimension of the cube (if any), and
+        # attach a suitable CubeUgrid object
         data_var = self.dataset.variables[cube.var_name]
         meshes_info = [
             (i_dim, self.meshdims_map.get(dim_name))
@@ -224,17 +231,10 @@ class UGridCFReader:
 
 
 def load_cubes(filenames, callback=None):
-    def create_ugrid_reader(filename):
-        """Function to create a CFReader object which is patched to do ugrid operations."""
-        ugrid_reader = UGridCFReader(filename)
-        # We must return the inner, actual CFReader object..
-        inner_cf_reader = ugrid_reader.cfreader
-        # .. but we also create on it a 'cube_completion' method, which the loader operation will call for us.
-        inner_cf_reader.cube_completion_adjust = (
-            ugrid_reader.complete_unstructured_cube
-        )
-        return inner_cf_reader
+    """
+    Load cubes from a netcdf file, interpreting both UGRID and CF structure.
 
+    """
     return iris.fileformats.netcdf.load_cubes(
-        filenames, callback=callback, create_reader=create_ugrid_reader
+        filenames, callback=callback, create_reader=UGridCFReader
     )
