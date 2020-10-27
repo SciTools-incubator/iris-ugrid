@@ -16,7 +16,9 @@ import iris.tests as tests
 from gridded.pyugrid.ugrid import UGrid
 
 from iris import Constraint
-from iris.cube import CubeList
+from iris.cube import CubeList, Cube
+
+from iris_ugrid.ucube import UCube
 from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
 
 
@@ -38,9 +40,9 @@ class TestUgrid(tests.IrisTest):
         self.assertEqual(len(loaded_cubes), 2)
 
         (cube_0,) = loaded_cubes.extract(Constraint("theta"))
-        (cube_1,) = loaded_cubes.extract(Constraint("radius"))
 
         # Check the primary cube.
+        self.assertIsInstance(cube_0, UCube)
         self.assertEqual(cube_0.var_name, "theta")
         self.assertEqual(cube_0.long_name, "Potential Temperature")
         self.assertEqual(cube_0.shape, (1, 6, 866))
@@ -62,6 +64,16 @@ class TestUgrid(tests.IrisTest):
         ugrid = cubegrid.grid
         self.assertIsInstance(ugrid, UGrid)
         self.assertEqual(ugrid.mesh_name, "Mesh0")
+
+    def test_nonugrid_load(self):
+        # Check that ugrid-load can still return "ordinary" cubes.
+        file_path = tests.get_data_path(
+            ("NetCDF", "rotated", "xy", "rotPole_landAreaFraction.nc")
+        )
+        cubes = CubeList(load_cubes(file_path))
+        cube = cubes[0]
+        self.assertIsInstance(cube, Cube)
+        self.assertFalse(isinstance(cube, UCube))
 
 
 if __name__ == "__main__":
