@@ -100,6 +100,18 @@ class CubeUgrid(
 
     def name(self):
         return ".".join([self.grid.mesh_name, self.mesh_location])
+ 
+    def cube_dims(self, cube):
+        # This is needed for cube summary generation, because this object is
+        # included as a "cube element" in the list structure returned by
+        # :meth:`UCube._summary_vector_sections_info`.
+        # All the other elements are _DimensionalMetadata objects.
+        # Hopefully this will be the only aspect of those which we must mimic.
+        if self.cube_dim is None:
+            result = ()
+        else:
+            result = (self.cube_dim,)
+        return result
 
 
 class UGridCFReader(CFReader):

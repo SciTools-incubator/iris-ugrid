@@ -15,3 +15,75 @@ class UCube(Cube):
     def __init__(self, *args, ugrid=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.ugrid = ugrid
+
+    def _summary_dim_name(self, dim):
+        """
+        Add an identifying "*" prefix to the mesh dimension.
+
+        This specialises the labelling of dims in cube summaries.
+
+        """
+        name = super()._summary_dim_name(dim)
+        if self.ugrid and dim == self.ugrid.cube_dim:
+            name = "*" + name
+        return name
+
+    def _summary_vector_sections_info(self):
+        """
+        Build the "vector summary sections" list.  This has the standard form,
+        plus one extra section to contain the mesh.
+
+        This extends cube summaries with a row showing the mesh as for a
+        coordinate, showing which cube dims it maps to.
+
+        """
+        specs = super()._summary_vector_sections_info()
+        if self.ugrid:
+            Spec = Cube._VectorSectionSpec
+            specs.append(
+                Spec(
+                    title="Unstructured mesh",
+                    elements=[self.ugrid],
+                    add_extra_lines=True,
+                )
+            )
+        return specs
+
+    def summary(self, shorten=False, *args, **kwargs):
+        """
+        Provide cube summaries, extended to include mesh information.
+
+        """
+        summary = super().summary(shorten=shorten, *args, **kwargs)
+        if self.ugrid and not shorten:
+            # Get a mesh description : as it prints itself.
+            detail_lines = str(self.ugrid).split("\n")
+
+            # Find the section that shows the grid info.
+            summary_lines = summary.split("\n")
+            ugrid_section_title = "Unstructured mesh"
+            i_ugrid_line = [
+                i
+                for i, line in enumerate(summary_lines)
+                if line.strip().startswith(ugrid_section_title)
+            ][0]
+
+            # Get the indent of the line below (the grid variable dims).
+            next_line = summary_lines[i_ugrid_line + 1]
+            indent = [
+                ind for ind, char in enumerate(next_line) if char != " "
+            ][0]
+
+            # Indent the mesh details 4 spaces more than that.
+            indent = " " * (indent + 4)
+            detail_lines = [indent + line for line in detail_lines]
+
+            # Splice in the detail lines after that, indenting to match.
+            i_next_section = i_ugrid_line + 2
+            summary_lines[i_next_section:i_next_section] = detail_lines
+
+            summary = "\n".join(summary_lines)
+
+        return summary
+
+
