@@ -48,14 +48,9 @@ Potential Temperature / (K)         (time: 1; levels: 6; *-- : 866)
           time                           x          -        -
      Unstructured mesh:
           Mesh0.node                     -          -        x
-              Cube unstructured-grid dimension:
-                 cube dimension = 2
-                 mesh_location = "node"
-                 mesh "Mesh0" :
-                 topology_dimension "2" :
-                 node_coordinates "latitude longitude" :
-                   <unprintable mesh>
-              
+              topology_dimension "2" :
+              node_coordinates "latitude longitude" :
+              <unprintable mesh>
      Attributes:
           Conventions: UGRID
           timeStamp: 2016-Oct-24 15:16:48 BST
