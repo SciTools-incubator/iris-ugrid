@@ -93,5 +93,3 @@ class UCube(Cube):
             summary = "\n".join(summary_lines)
 
         return summary
-
-
