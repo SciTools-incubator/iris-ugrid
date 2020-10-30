@@ -59,9 +59,11 @@ class UCube(Cube):
             # Get a mesh description : as it prints itself.
             detail_lines = str(self.ugrid).split("\n")
             # Use only certain parts: which happens to be the last N lines.
-            i_wanted_line, = [i
-                              for i, line in enumerate(detail_lines)
-                              if 'topology_dimension' in line]
+            (i_wanted_line,) = [
+                i
+                for i, line in enumerate(detail_lines)
+                if "topology_dimension" in line
+            ]
             # Cut out end portion, strip lines and discard blank ones.
             detail_lines = detail_lines[i_wanted_line:]
             detail_lines = [line.strip() for line in detail_lines]
@@ -70,7 +72,7 @@ class UCube(Cube):
             # Find the section that shows the grid info.
             summary_lines = summary.split("\n")
             ugrid_section_title = "Unstructured mesh"
-            i_ugrid_line, = [
+            (i_ugrid_line,) = [
                 i
                 for i, line in enumerate(summary_lines)
                 if line.strip().startswith(ugrid_section_title)

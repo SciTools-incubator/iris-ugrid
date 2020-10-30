@@ -72,12 +72,15 @@ Potential Temperature / (K)         (time: 1; levels: 6; *-- : 866)
         # a summary of the unstructured dimension, and mesh details.
         str_dim = '<th class="iris iris-word-cell">*--</th>'
         self.assertIn(str_dim, result)
-        str_section = \
+        str_section = (
             '<td class="iris-title iris-word-cell">Unstructured mesh</td>'
+        )
         self.assertIn(str_section, result)
-        re_mesh = (r'<td class="iris-word-cell iris-subheading-cell">'
-                   r'\s*Mesh0\s*</td>'
-                   r'\s*<td class="iris-inclusion-cell">node</td>')
+        re_mesh = (
+            r'<td class="iris-word-cell iris-subheading-cell">'
+            r"\s*Mesh0\s*</td>"
+            r'\s*<td class="iris-inclusion-cell">node</td>'
+        )
         self.assertIsNotNone(re.search(re_mesh, result))
 
 
