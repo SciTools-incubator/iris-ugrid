@@ -80,13 +80,13 @@ class UCube(Cube):
 
             # Get the indent of the line below (the grid variable dims).
             next_line = summary_lines[i_ugrid_line + 1]
-            indent = [
+            indent_number = [
                 ind for ind, char in enumerate(next_line) if char != " "
             ][0]
 
             # Indent the mesh details 4 spaces more than that.
-            indent = " " * (indent + 4)
-            detail_lines = [indent + line for line in detail_lines]
+            indent_string = " " * (indent_number + 4)
+            detail_lines = [indent_string + line for line in detail_lines]
 
             # Splice in the detail lines after that, indenting to match.
             i_next_section = i_ugrid_line + 2
