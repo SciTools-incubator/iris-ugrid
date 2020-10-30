@@ -201,6 +201,14 @@ class UGridCFReader(CFReader):
         Constructs a :class:`CubeUgrid` referencing the appropriate file mesh,
         and makes a new `UCube` of which this is the '.ugrid' property.
 
+        Args:
+
+        * cube (:class:`iris.cube.Cube`):
+            The cube to be post-processed
+
+        Returns:
+            :class:`iris_ugrid.ucube.UCube`
+
         """
         # Identify the unstructured-grid dimension of the cube (if any), and
         # attach a suitable CubeUgrid object
@@ -238,8 +246,9 @@ class UGridCFReader(CFReader):
                 topology_dimension=topology_dimension,
                 node_coordinates=sorted(node_coordinates),
             )
-            # Return a new UCube, based on the provided Cube, and replacing it
-            # in the caller (and as returned to user).
+            # Return a new UCube, based on the provided Cube. Relying on the
+            # caller (e.g. :func:iris.fileformats.netcdf.load_cubes) to
+            # appropriately handle any replacement of the original Cube.
             # Absolutely **everything** is the same, except for the extra ugrid
             # property.
             new_result_cube = UCube(
