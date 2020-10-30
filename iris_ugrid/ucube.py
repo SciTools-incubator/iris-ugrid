@@ -66,7 +66,6 @@ class UCube(Cube):
             ]
             # Cut out end portion, strip lines and discard blank ones.
             detail_lines = detail_lines[i_wanted_line:]
-            # detail_lines = [line.strip() for line in detail_lines]
             detail_lines = [line for line in detail_lines if line]
 
             # Find the section that shows the grid info.
