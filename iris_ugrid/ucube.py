@@ -24,7 +24,7 @@ class UCube(Cube):
 
         """
         name = super()._summary_dim_name(dim)
-        if self.ugrid and dim == self.ugrid.cube_dim:
+        if self.ugrid is not None and dim == self.ugrid.cube_dim:
             name = "*" + name
         return name
 
