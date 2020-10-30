@@ -11,16 +11,14 @@ import iris.tests as tests
 import re
 
 from iris import Constraint
-from iris.tests import IrisTest, get_data_path
-
 from iris.cube import CubeList
 
 from iris_ugrid.ugrid_cf_reader import load_cubes
 
 
-class Test_cube_representations(IrisTest):
+class Test_cube_representations(tests.IrisTest):
     def setUp(self):
-        file_path = get_data_path(
+        file_path = tests.get_data_path(
             ("NetCDF", "unstructured_grid", "theta_nodal_xios.nc")
         )
         loaded_cubes = CubeList(load_cubes(file_path))
