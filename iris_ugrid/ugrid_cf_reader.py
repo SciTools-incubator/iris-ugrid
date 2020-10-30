@@ -209,7 +209,7 @@ class UGridCFReader(CFReader):
             The cube to be post-processed
 
         Returns:
-            :class:`iris_ugrid.ucube.UCube`
+            :class:`iris_ugrid.ucube.UCube` or ``None``
 
         """
         # Identify the unstructured-grid dimension of the cube (if any), and
