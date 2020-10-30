@@ -21,6 +21,7 @@ import iris.fileformats.cf
 from iris.fileformats.cf import CFReader
 import iris.fileformats.netcdf
 
+from iris_ugrid.ucube import UCube
 
 _UGRID_ELEMENT_TYPE_NAMES = ("node", "edge", "face", "volume")
 
@@ -99,6 +100,18 @@ class CubeUgrid(
 
     def name(self):
         return ".".join([self.grid.mesh_name, self.mesh_location])
+
+    def cube_dims(self, cube):
+        # This is needed for cube summary generation, because this object is
+        # included as a "cube element" in the list structure returned by
+        # :meth:`UCube._summary_vector_sections_info`.
+        # All the other elements are _DimensionalMetadata objects.
+        # Hopefully this will be the only aspect of those which we must mimic.
+        if self.cube_dim is None:
+            result = ()
+        else:
+            result = (self.cube_dim,)
+        return result
 
 
 class UGridCFReader(CFReader):
@@ -179,19 +192,27 @@ class UGridCFReader(CFReader):
 
     def cube_completion_adjust(self, cube):
         """
-        Cube post-processing method to add details of the mesh to any newly
-        created cubes which have a mesh dimension.
+        Cube post-processing method convert newly created cubes which have a
+        a mesh dimension into :class:`UCubes`s.
 
         Called by a 'cube post-modify hook' in
         :func:`iris.fileformats.netcdf.load_cubes`.
 
-        Adds the ".ugrid" property to cubes created by the CF reader, which
-        links the cube mesh dimension to a specific mesh and element-type (aka
-        "mesh_location").
+        Constructs a :class:`CubeUgrid` referencing the appropriate file mesh,
+        and makes a new `UCube` of which this is the '.ugrid' property.
+
+        Args:
+
+        * cube (:class:`iris.cube.Cube`):
+            The cube to be post-processed
+
+        Returns:
+            :class:`iris_ugrid.ucube.UCube` or ``None``
 
         """
         # Identify the unstructured-grid dimension of the cube (if any), and
         # attach a suitable CubeUgrid object
+        new_result_cube = None
         data_var = self.dataset.variables[cube.var_name]
         meshes_info = [
             (i_dim, self.meshdims_map.get(dim_name))
@@ -218,16 +239,35 @@ class UGridCFReader(CFReader):
                 )
                 node_coordinates.append(name)
 
-            cube.ugrid = CubeUgrid(
+            cube_ugrid = CubeUgrid(
                 cube_dim=i_dim,
                 grid=mesh,
                 mesh_location=mesh_location,
                 topology_dimension=topology_dimension,
                 node_coordinates=sorted(node_coordinates),
             )
-        else:
-            # Add an empty 'cube.ugrid' to all cubes otherwise.
-            cube.ugrid = None
+            # Return a new UCube, based on the provided Cube. Relying on the
+            # caller (e.g. :func:iris.fileformats.netcdf.load_cubes) to
+            # appropriately handle any replacement of the original Cube.
+            # Absolutely **everything** is the same, except for the extra ugrid
+            # property.
+            new_result_cube = UCube(
+                data=cube.core_data(),
+                standard_name=cube.standard_name,
+                long_name=cube.long_name,
+                var_name=cube.var_name,
+                units=cube.units,
+                attributes=cube.attributes,
+                cell_methods=cube.cell_methods,
+                dim_coords_and_dims=cube._dim_coords_and_dims,
+                aux_coords_and_dims=cube._aux_coords_and_dims,
+                aux_factories=cube.aux_factories,
+                cell_measures_and_dims=cube._cell_measures_and_dims,
+                ancillary_variables_and_dims=cube._ancillary_variables_and_dims,
+                ugrid=cube_ugrid,
+            )
+
+        return new_result_cube
 
 
 def load_cubes(filenames, callback=None):
