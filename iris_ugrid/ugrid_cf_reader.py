@@ -89,7 +89,7 @@ class CubeUgrid(
         result += (
             f'\n{indent}node_coordinates: "{" ".join(self.node_coordinates)}"'
         )
-        result += f"\n{indent}mesh detail:\n"
+        result += f"\n{indent}Mesh detail:\n"
         try:
             mesh_str = str(self.grid.info)
         except TypeError:
