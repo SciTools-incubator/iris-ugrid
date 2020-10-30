@@ -57,7 +57,7 @@ Potential Temperature / (K)         (time: 1; levels: 6; *-- : 866)
           Mesh0.node                     -          -        x
                topology_dimension: "2"
                node_coordinates: "latitude longitude"
-               mesh detail:
+               Mesh detail:
                     <unprintable mesh>
      Attributes:
           Conventions: UGRID
