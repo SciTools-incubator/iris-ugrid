@@ -80,21 +80,23 @@ class CubeUgrid(
     """
 
     def __str__(self):
+        indent = " " * 5
         result = "Cube unstructured-grid dimension:"
-        result += "\n   cube dimension = {}".format(self.cube_dim)
-        result += '\n   mesh_location = "{}"'.format(self.mesh_location)
-        result += '\n   mesh "{}" :'.format(self.grid.mesh_name)
-        result += '\n   topology_dimension "{}" :'.format(
-            self.topology_dimension
+        result += f"\n{indent}cube dimension = {self.cube_dim}"
+        result += f'\n{indent}mesh_location = "{self.mesh_location}"'
+        result += f'\n{indent}mesh: "{self.grid.mesh_name}"'
+        result += f'\n{indent}topology_dimension: "{self.topology_dimension}"'
+        result += (
+            f'\n{indent}node_coordinates: "{" ".join(self.node_coordinates)}"'
         )
-        result += '\n   node_coordinates "{}" :\n'.format(
-            " ".join(self.node_coordinates)
-        )
+        result += f"\n{indent}Mesh detail:\n"
         try:
             mesh_str = str(self.grid.info)
         except TypeError:
             mesh_str = "<unprintable mesh>"
-        result += "\n".join(["     " + line for line in mesh_str.split("\n")])
+        result += "\n".join(
+            [(indent * 2) + line for line in mesh_str.split("\n")]
+        )
         result += "\n"
         return result
 

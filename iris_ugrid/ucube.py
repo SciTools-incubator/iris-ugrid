@@ -66,7 +66,6 @@ class UCube(Cube):
             ]
             # Cut out end portion, strip lines and discard blank ones.
             detail_lines = detail_lines[i_wanted_line:]
-            detail_lines = [line.strip() for line in detail_lines]
             detail_lines = [line for line in detail_lines if line]
 
             # Find the section that shows the grid info.
@@ -84,8 +83,9 @@ class UCube(Cube):
                 ind for ind, char in enumerate(next_line) if char != " "
             ][0]
 
-            # Indent the mesh details 4 spaces more than that.
-            indent_string = " " * (indent_number + 4)
+            # Indent the mesh details to the same level (they have the their
+            # own inherent extra indent).
+            indent_string = " " * (indent_number)
             detail_lines = [indent_string + line for line in detail_lines]
 
             # Splice in the detail lines after that, indenting to match.
