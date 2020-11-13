@@ -14,7 +14,7 @@ import os
 
 
 def create_synthetic_data_file(temp_file_dir, dataset_name,
-                               n_faces=866, n_times=1, include_edges=True):
+                               n_faces=866, n_times=1):
 
     nc_filepath = os.path.join(temp_file_dir, dataset_name + '.nc')
     cdl_filepath = os.path.join(temp_file_dir, dataset_name + '.cdl')
@@ -27,7 +27,6 @@ def create_synthetic_data_file(temp_file_dir, dataset_name,
             axis_nbounds = 2 ;
             Two = 2 ;
             nMesh2d_half_levels_node = {n_faces + 2} ;
-            nMesh2d_half_levels_edge = {n_faces * 2} ;
             nMesh2d_half_levels_face = {n_faces} ;
             nMesh2d_half_levels_vertex = 4 ;
             time_counter = UNLIMITED ; // (1 currently)
@@ -37,13 +36,8 @@ def create_synthetic_data_file(temp_file_dir, dataset_name,
                 Mesh2d_half_levels:long_name = "Topology data of 2D unstructured mesh" ;
                 Mesh2d_half_levels:topology_dimension = 2 ;
                 Mesh2d_half_levels:node_coordinates = "Mesh2d_half_levels_node_x Mesh2d_half_levels_node_y" ;
-                Mesh2d_half_levels:edge_coordinates = "Mesh2d_half_levels_edge_x Mesh2d_half_levels_edge_y" ;
-                Mesh2d_half_levels:edge_node_connectivity = "Mesh2d_half_levels_edge_nodes" ;
                 Mesh2d_half_levels:face_coordinates = "Mesh2d_half_levels_face_x Mesh2d_half_levels_face_y" ;
                 Mesh2d_half_levels:face_node_connectivity = "Mesh2d_half_levels_face_nodes" ;
-                Mesh2d_half_levels:face_edge_connectivity = "Mesh2d_half_levels_face_edges" ;
-                Mesh2d_half_levels:edge_face_connectivity = "Mesh2d_half_levels_edge_face_links" ;
-                Mesh2d_half_levels:face_face_connectivity = "Mesh2d_half_levels_face_links" ;
             float Mesh2d_half_levels_node_x(nMesh2d_half_levels_node) ;
                 Mesh2d_half_levels_node_x:standard_name = "longitude" ;
                 Mesh2d_half_levels_node_x:long_name = "Longitude of mesh nodes." ;
@@ -52,18 +46,6 @@ def create_synthetic_data_file(temp_file_dir, dataset_name,
                 Mesh2d_half_levels_node_y:standard_name = "latitude" ;
                 Mesh2d_half_levels_node_y:long_name = "Latitude of mesh nodes." ;
                 Mesh2d_half_levels_node_y:units = "degrees_north" ;
-            float Mesh2d_half_levels_edge_x(nMesh2d_half_levels_edge) ;
-                Mesh2d_half_levels_edge_x:standard_name = "longitude" ;
-                Mesh2d_half_levels_edge_x:long_name = "Characteristic longitude of mesh edges." ;
-                Mesh2d_half_levels_edge_x:units = "degrees_east" ;
-            float Mesh2d_half_levels_edge_y(nMesh2d_half_levels_edge) ;
-                Mesh2d_half_levels_edge_y:standard_name = "latitude" ;
-                Mesh2d_half_levels_edge_y:long_name = "Characteristic latitude of mesh edges." ;
-                Mesh2d_half_levels_edge_y:units = "degrees_north" ;
-            int Mesh2d_half_levels_edge_nodes(nMesh2d_half_levels_edge, Two) ;
-                Mesh2d_half_levels_edge_nodes:cf_role = "edge_node_connectivity" ;
-                Mesh2d_half_levels_edge_nodes:long_name = "Maps every edge/link to two nodes that it connects." ;
-                Mesh2d_half_levels_edge_nodes:start_index = 0 ;
             float Mesh2d_half_levels_face_x(nMesh2d_half_levels_face) ;
                 Mesh2d_half_levels_face_x:standard_name = "longitude" ;
                 Mesh2d_half_levels_face_x:long_name = "Characteristic longitude of mesh faces." ;
@@ -76,24 +58,6 @@ def create_synthetic_data_file(temp_file_dir, dataset_name,
                 Mesh2d_half_levels_face_nodes:cf_role = "face_node_connectivity" ;
                 Mesh2d_half_levels_face_nodes:long_name = "Maps every face to its corner nodes." ;
                 Mesh2d_half_levels_face_nodes:start_index = 0 ;
-            int Mesh2d_half_levels_face_edges(nMesh2d_half_levels_face, nMesh2d_half_levels_vertex) ;
-                Mesh2d_half_levels_face_edges:cf_role = "face_edge_connectivity" ;
-                Mesh2d_half_levels_face_edges:long_name = "Maps every face to its edges." ;
-                Mesh2d_half_levels_face_edges:start_index = 0 ;
-                Mesh2d_half_levels_face_edges:_FillValue = 999999 ;
-            int Mesh2d_half_levels_edge_face_links(nMesh2d_half_levels_edge, Two) ;
-                Mesh2d_half_levels_edge_face_links:cf_role = "edge_face_connectivity" ;
-                Mesh2d_half_levels_edge_face_links:long_name = "neighbor faces for edges" ;
-                Mesh2d_half_levels_edge_face_links:start_index = 0 ;
-                Mesh2d_half_levels_edge_face_links:_FillValue = -999 ;
-                Mesh2d_half_levels_edge_face_links:comment = "missing neighbor faces are indicated using _FillValue" ;
-            int Mesh2d_half_levels_face_links(nMesh2d_half_levels_face, nMesh2d_half_levels_vertex) ;
-                Mesh2d_half_levels_face_links:cf_role = "face_face_connectivity" ;
-                Mesh2d_half_levels_face_links:long_name = "Indicates which other faces neighbor each face" ;
-                Mesh2d_half_levels_face_links:start_index = 0 ;
-                Mesh2d_half_levels_face_links:_FillValue = 999999 ;
-                Mesh2d_half_levels_face_links:flag_values = -1 ;
-                Mesh2d_half_levels_face_links:flag_meanings = "out_of_mesh" ;
             double time_instant(time_counter) ;
                 time_instant:standard_name = "time" ;
                 time_instant:long_name = "Time axis" ;

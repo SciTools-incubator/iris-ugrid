@@ -62,6 +62,8 @@ class TestUgrid(tests.IrisTest):
         ugrid = cubegrid.grid
         self.assertIsInstance(ugrid, UGrid)
         self.assertEqual(ugrid.mesh_name, "Mesh2d_half_levels")
+        self.assertIsNotNone(ugrid.face_coordinates)
+        self.assertEqual(ugrid.face_coordinates.shape, (866, 2))
 
 
 if __name__ == "__main__":
