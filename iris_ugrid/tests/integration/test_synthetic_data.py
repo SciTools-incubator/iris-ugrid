@@ -17,11 +17,13 @@ import iris.tests as tests
 from gridded.pyugrid.ugrid import UGrid
 from iris_ugrid.ucube import UCube
 from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
-from iris_ugrid.tests.synthetic_data_generator import create_file__xios_half_levels_faces
+from iris_ugrid.tests.synthetic_data_generator import (
+    create_file__xios_half_levels_faces,
+)
+
 
 @tests.skip_data
 class Test_create_file__xios_half_levels_faces(tests.IrisTest):
-
     @classmethod
     def setUpClass(cls):
         # Create a temp directory for transient test files.
@@ -35,7 +37,8 @@ class Test_create_file__xios_half_levels_faces(tests.IrisTest):
     def create_synthetic_testcube(self, **create_kwargs):
 
         file_path = create_file__xios_half_levels_faces(
-            temp_file_dir=self.temp_dir, dataset_name='mesh', **create_kwargs)
+            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
+        )
 
         # cube = iris.load_cube(file_path, "theta")
         # Note: cannot use iris.load, as merge can not yet handle UCubes.
@@ -45,7 +48,7 @@ class Test_create_file__xios_half_levels_faces(tests.IrisTest):
         # We expect just 1 cube.
         self.assertEqual(len(loaded_cubes), 1)
 
-        cube, = loaded_cubes
+        (cube,) = loaded_cubes
         return cube
 
     def check_ucube(self, cube, expected_shape):

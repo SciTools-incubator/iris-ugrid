@@ -13,11 +13,13 @@ import netCDF4
 import os
 
 
-def create_file__xios_half_levels_faces(temp_file_dir, dataset_name, n_faces=866, n_times=1):
+def create_file__xios_half_levels_faces(
+    temp_file_dir, dataset_name, n_faces=866, n_times=1
+):
     # Create a synthetic netcdf file with XIOS-like content.
     # Contains a single data variable, on mesh faces.
     # For now : omits all optional information (on edges + connectivity), *except* for face locations.
-    nc_filepath = os.path.join(temp_file_dir, dataset_name + '.nc')
+    nc_filepath = os.path.join(temp_file_dir, dataset_name + ".nc")
 
     # Create a CDL string specifying the structure of the file (but not variable contents).
     cdl = f"""
@@ -83,21 +85,24 @@ def create_file__xios_half_levels_faces(temp_file_dir, dataset_name, n_faces=866
     """
 
     # Spawn an "ncgen" command to create an actual netcdf file from the cdl string.
-    subprocess.run(['ncgen', '-o' + nc_filepath],
-                   input=cdl, encoding='ascii', check=True)
+    subprocess.run(
+        ["ncgen", "-o" + nc_filepath], input=cdl, encoding="ascii", check=True
+    )
 
     # Load the netcdf file and post-modify it to define the variable data contents.
-    ds = netCDF4.Dataset(nc_filepath, 'r+')
+    ds = netCDF4.Dataset(nc_filepath, "r+")
 
     # Fill all data variables (both mesh and phenomenon vars) with zeros.
     for var in ds.variables.values():
         shape = list(var.shape)
         dims = var.dimensions
         # Where vars use the time dim, which is unlimited (=0), fill that with the desired length.
-        shape = [n_times if dim == 'time_counter' else size
-                 for dim, size in zip(dims, shape)]
+        shape = [
+            n_times if dim == "time_counter" else size
+            for dim, size in zip(dims, shape)
+        ]
         data = np.zeros(shape, dtype=var.dtype)
-        if 'time_instant' in var.name:
+        if "time_instant" in var.name:
             # Fill the time + time-bounds vars with ascending values (not all zeroes), so it can be a dim-coord.
             data = np.arange(data.size, dtype=data.dtype).reshape(data.shape)
         var[:] = data
