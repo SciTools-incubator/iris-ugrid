@@ -18,8 +18,8 @@ def create_file__xios_half_levels_faces(temp_file_dir, dataset_name, n_faces=866
     # Contains a single data variable, on mesh faces.
     # For now : omits all optional information (on edges + connectivity), *except* for face locations.
     nc_filepath = os.path.join(temp_file_dir, dataset_name + '.nc')
-    cdl_filepath = os.path.join(temp_file_dir, dataset_name + '.cdl')
 
+    # Create a CDL string specifying the structure of the file (but not variable contents).
     cdl = f"""
         netcdf {dataset_name} {{
         dimensions:
@@ -82,23 +82,18 @@ def create_file__xios_half_levels_faces(temp_file_dir, dataset_name, n_faces=866
         }}
     """
 
-    with open(cdl_filepath, 'w') as filehandle:
-        filehandle.write(cdl)
+    # Spawn an "ncgen" command to create an actual netcdf file from the cdl string.
+    subprocess.run(['ncgen', '-o' + nc_filepath],
+                   input=cdl, encoding='ascii', check=True)
 
-    completed_process = subprocess.run(
-        ['ncgen', '-o'+nc_filepath, cdl_filepath])
-
-    print(completed_process)
-
-    # Post-modify to define the variable data contents.
-    # We could probably have another standard utility routine to do this.
+    # Load the netcdf file and post-modify it to define the variable data contents.
     ds = netCDF4.Dataset(nc_filepath, 'r+')
 
-    # Fill all the data variables (both mesh and phenomenon vars) with zeros.
+    # Fill all data variables (both mesh and phenomenon vars) with zeros.
     for var in ds.variables.values():
         shape = list(var.shape)
         dims = var.dimensions
-        # Where vars use the time dim, which is unlimited = 0, fill that with the desired length.
+        # Where vars use the time dim, which is unlimited (=0), fill that with the desired length.
         shape = [n_times if dim == 'time_counter' else size
                  for dim, size in zip(dims, shape)]
         data = np.zeros(shape, dtype=var.dtype)
