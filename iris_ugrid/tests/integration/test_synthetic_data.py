@@ -15,7 +15,7 @@ import shutil
 import tempfile
 import iris.tests as tests
 from gridded.pyugrid.ugrid import UGrid
-from iris import Constraint
+from iris_ugrid.ucube import UCube
 from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
 from iris_ugrid.tests.synthetic_data_generator import create_synthetic_data_file
 
@@ -34,10 +34,9 @@ class TestUgrid(tests.IrisTest):
 
     def test_basic_load(self):
         file_path = create_synthetic_data_file(temp_file_dir=self.temp_dir, dataset_name='mesh')
-#         file_path = '/project/avd/ng-vat/data/r25376_lfric_atm_files/lfric_ngvat_2D_1t_face_half_levels_main_conv_rain.nc'
 
         # cube = iris.load_cube(file_path, "theta")
-        # Note: cannot use iris.load, as merge can not yet handle UCubes
+        # Note: cannot use iris.load, as merge can not yet handle UCubes.
 
         # Here's a thing that at least works.
         loaded_cubes = list(load_cubes(file_path))
@@ -47,28 +46,22 @@ class TestUgrid(tests.IrisTest):
 
         cube, = loaded_cubes
 
-        # Check the primary cube.
+        # Basic checks on the primary data cube.
         self.assertEqual(cube.var_name, "conv_rain")
         self.assertEqual(cube.long_name, "surface_convective_rainfall_rate")
-        self.assertEqual(cube.shape, (2, 866))
-        self.assertEqual(
-            cube.coord_dims(cube.coord("time", dim_coords=True)), (0,)
-        )
-        self.assertEqual(cube.coord_dims("levels"), (1,))
-        self.assertEqual(cube.coords(dimensions=2), [])
+        self.assertEqual(cube.shape, (1, 866))
 
-        # Check the cube.ugrid object.
+        # Also just a few checks on the attached grid information.
+        self.assertIsInstance(cube, UCube)
         cubegrid = cube.ugrid
         self.assertIsInstance(cubegrid, CubeUgrid)
-        self.assertEqual(cubegrid.cube_dim, 2)
-        self.assertEqual(cubegrid.mesh_location, "node")
+        self.assertEqual(cubegrid.cube_dim, 1)
+        self.assertEqual(cubegrid.mesh_location, "face")
         self.assertEqual(cubegrid.topology_dimension, 2)
         self.assertEqual(cubegrid.node_coordinates, ["latitude", "longitude"])
-
-        # Check cube.ugrid.grid : a gridded Grid type.
         ugrid = cubegrid.grid
         self.assertIsInstance(ugrid, UGrid)
-        self.assertEqual(ugrid.mesh_name, "Mesh0")
+        self.assertEqual(ugrid.mesh_name, "Mesh2d_half_levels")
 
 
 if __name__ == "__main__":
