@@ -17,10 +17,10 @@ import iris.tests as tests
 from gridded.pyugrid.ugrid import UGrid
 from iris_ugrid.ucube import UCube
 from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
-from iris_ugrid.tests.synthetic_data_generator import create_synthetic_data_file
+from iris_ugrid.tests.synthetic_data_generator import create_file__xios_half_levels_faces
 
 @tests.skip_data
-class TestUgrid(tests.IrisTest):
+class Test_create_file__xios_half_levels_faces(tests.IrisTest):
 
     @classmethod
     def setUpClass(cls):
@@ -32,26 +32,29 @@ class TestUgrid(tests.IrisTest):
         # Destroy the temp directory.
         shutil.rmtree(cls.temp_dir)
 
-    def test_basic_load(self):
-        file_path = create_synthetic_data_file(temp_file_dir=self.temp_dir, dataset_name='mesh')
+    def create_synthetic_testcube(self, **create_kwargs):
+
+        file_path = create_file__xios_half_levels_faces(
+            temp_file_dir=self.temp_dir, dataset_name='mesh', **create_kwargs)
 
         # cube = iris.load_cube(file_path, "theta")
         # Note: cannot use iris.load, as merge can not yet handle UCubes.
-
         # Here's a thing that at least works.
         loaded_cubes = list(load_cubes(file_path))
 
-        # Just check some expected details.
+        # We expect just 1 cube.
         self.assertEqual(len(loaded_cubes), 1)
 
         cube, = loaded_cubes
+        return cube
 
+    def check_ucube(self, cube, expected_shape):
         # Basic checks on the primary data cube.
         self.assertEqual(cube.var_name, "conv_rain")
         self.assertEqual(cube.long_name, "surface_convective_rainfall_rate")
-        self.assertEqual(cube.shape, (1, 866))
+        self.assertEqual(cube.shape, expected_shape)
 
-        # Also just a few checks on the attached grid information.
+        # Also a few checks on the attached grid information.
         self.assertIsInstance(cube, UCube)
         cubegrid = cube.ugrid
         self.assertIsInstance(cubegrid, CubeUgrid)
@@ -63,7 +66,19 @@ class TestUgrid(tests.IrisTest):
         self.assertIsInstance(ugrid, UGrid)
         self.assertEqual(ugrid.mesh_name, "Mesh2d_half_levels")
         self.assertIsNotNone(ugrid.face_coordinates)
-        self.assertEqual(ugrid.face_coordinates.shape, (866, 2))
+        self.assertEqual(ugrid.face_coordinates.shape, (expected_shape[1], 2))
+
+    def test_basic_load(self):
+        cube = self.create_synthetic_testcube()
+        self.check_ucube(cube, expected_shape=(1, 866))
+
+    def test_scale_mesh(self):
+        cube = self.create_synthetic_testcube(n_faces=10)
+        self.check_ucube(cube, expected_shape=(1, 10))
+
+    def test_scale_time(self):
+        cube = self.create_synthetic_testcube(n_times=3, n_faces=10)
+        self.check_ucube(cube, expected_shape=(3, 10))
 
 
 if __name__ == "__main__":

@@ -13,16 +13,15 @@ import netCDF4
 import os
 
 
-def create_synthetic_data_file(temp_file_dir, dataset_name,
-                               n_faces=866, n_times=1):
-
+def create_file__xios_half_levels_faces(temp_file_dir, dataset_name, n_faces=866, n_times=1):
+    # Create a synthetic netcdf file with XIOS-like content.
+    # Contains a single data variable, on mesh faces.
+    # For now : omits all optional information (on edges + connectivity), *except* for face locations.
     nc_filepath = os.path.join(temp_file_dir, dataset_name + '.nc')
     cdl_filepath = os.path.join(temp_file_dir, dataset_name + '.cdl')
 
-    nc_filename = 'lfric_ngvat_2D_1t_face_half_levels_main_conv_rain'
-
     cdl = f"""
-        netcdf {nc_filename} {{
+        netcdf {dataset_name} {{
         dimensions:
             axis_nbounds = 2 ;
             Two = 2 ;
@@ -79,11 +78,7 @@ def create_synthetic_data_file(temp_file_dir, dataset_name,
         
         // global attributes:
                 :name = "lfric_ngvat_2D_1t_face_half_levels_main_conv_rain" ;
-                :description = "Created by xios" ;
-                :title = "Created by xios" ;
                 :Conventions = "UGRID" ;
-                :timeStamp = "2020-Oct-18 21:20:18 GMT" ;
-                :uuid = "85317dbf-79e1-44d6-9032-a8c9b76b6fc0" ;
         }}
     """
 
