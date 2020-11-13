@@ -22,7 +22,6 @@ from iris_ugrid.tests.synthetic_data_generator import (
 )
 
 
-@tests.skip_data
 class Test_create_file__xios_half_levels_faces(tests.IrisTest):
     @classmethod
     def setUpClass(cls):

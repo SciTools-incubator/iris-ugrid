@@ -6,7 +6,6 @@
 """
 Provides synthetic data generation capability in order to test ugrid loading and regridding.
 """
-import pathlib
 import subprocess
 import numpy as np
 import netCDF4
@@ -77,7 +76,7 @@ def create_file__xios_half_levels_faces(
                 conv_rain:interval_write = "21600 s" ;
                 conv_rain:cell_methods = "time: point (interval: 300 s)" ;
                 conv_rain:coordinates = "time_instant Mesh2d_half_levels_face_y Mesh2d_half_levels_face_x" ;
-        
+
         // global attributes:
                 :name = "lfric_ngvat_2D_1t_face_half_levels_main_conv_rain" ;
                 :Conventions = "UGRID" ;
