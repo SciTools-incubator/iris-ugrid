@@ -13,7 +13,8 @@ import netCDF4
 import os
 
 
-def create_synthetic_data_file(temp_file_dir, dataset_name, n_faces=866, n_times=2):
+def create_synthetic_data_file(temp_file_dir, dataset_name,
+                               n_faces=866, n_times=2, include_edges=True):
 
     nc_filepath = os.path.join(temp_file_dir, dataset_name + '.nc')
     cdl_filepath = os.path.join(temp_file_dir, dataset_name + '.cdl')
@@ -40,6 +41,9 @@ def create_synthetic_data_file(temp_file_dir, dataset_name, n_faces=866, n_times
                 Mesh2d_half_levels:edge_node_connectivity = "Mesh2d_half_levels_edge_nodes" ;
                 Mesh2d_half_levels:face_coordinates = "Mesh2d_half_levels_face_x Mesh2d_half_levels_face_y" ;
                 Mesh2d_half_levels:face_node_connectivity = "Mesh2d_half_levels_face_nodes" ;
+                Mesh2d_half_levels:face_edge_connectivity = "Mesh2d_half_levels_face_edges" ;
+                Mesh2d_half_levels:edge_face_connectivity = "Mesh2d_half_levels_edge_face_links" ;
+                Mesh2d_half_levels:node_node_connectivity = "Mesh2d_half_levels_face_links" ;
             float Mesh2d_half_levels_node_x(nMesh2d_half_levels_node) ;
                 Mesh2d_half_levels_node_x:standard_name = "longitude" ;
                 Mesh2d_half_levels_node_x:long_name = "Longitude of mesh nodes." ;
@@ -119,6 +123,12 @@ def create_synthetic_data_file(temp_file_dir, dataset_name, n_faces=866, n_times
         }}
     """
 
+    if not include_edges:
+        # The single data variable doesn't use any of the 'edges' info, so optionally remove all of that,
+        # by cutting out any lines with 'edge' in : crude but it works!
+        cdl = '\n'.join(line for line in cdl.split('\n')
+                        if 'edge' not in line.lower())
+
     with open(cdl_filepath, 'w') as filehandle:
         filehandle.write(cdl)
 
@@ -131,12 +141,17 @@ def create_synthetic_data_file(temp_file_dir, dataset_name, n_faces=866, n_times
     # We could probably have another standard utility routine to do this.
     ds = netCDF4.Dataset(nc_filepath, 'r+')
 
+    # Fill all the data variables (both mesh and phenomenon vars) with zeros.
     for var in ds.variables.values():
         shape = list(var.shape)
         dims = var.dimensions
+        # Where vars use the time dim, which is unlimited = 0, fill that with the desired length.
         shape = [n_times if dim == 'time_counter' else size
                  for dim, size in zip(dims, shape)]
         data = np.zeros(shape, dtype=var.dtype)
+        if var.name == 'time_instant':
+            # Fill the time var with ascending values (not all zeroes), so it can be a dim-coord.
+            data = np.arange(data.size, dtype=data.dtype).reshape(data.shape)
         var[:] = data
 
     ds.close()
