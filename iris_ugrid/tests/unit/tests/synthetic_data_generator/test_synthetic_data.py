@@ -4,7 +4,7 @@
 # See COPYING and COPYING.LESSER in the root of the repository for full
 # licensing details.
 """
-Integration tests for the
+Unit tests for the
 :mod:`iris.fileformats.tests.synthetic_data_generator` module.
 
 """
