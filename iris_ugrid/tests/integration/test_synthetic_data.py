@@ -5,7 +5,7 @@
 # licensing details.
 """
 Integration tests for the
-:mod:`iris.fileformats.ugrid_cf_reader.UGridCFReader` class.
+:mod:`iris.fileformats.tests.synthetic_data_generator` module.
 
 """
 
