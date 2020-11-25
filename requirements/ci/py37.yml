@@ -1,0 +1,15 @@
+name: iris-ugrid-dev
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.7
+
+# Core dependencies.
+  - esmpy>=8.0.1
+  - gridded
+
+# Test dependencies.
+  - black=19.10b0
+  - pytest
