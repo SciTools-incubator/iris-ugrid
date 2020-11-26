@@ -37,6 +37,12 @@ def venv_cached(session, env_spec_path, iris_commit):
     session: object
         A `nox.sessions.Session` object.
 
+    env_spec_path: pathlib.Path
+        A Path object pointing to the conda env spec YAML for Iris-ugrid.
+
+    iris_commit : str
+        The string for the Iris commit Iris-ugrid is dependent on.
+
     Returns
     -------
     bool
@@ -81,6 +87,12 @@ def cache_venv(session, env_spec_path, iris_commit):
     ----------
     session: object
         A `nox.sessions.Session` object.
+
+    env_spec_path: pathlib.Path
+        A Path object pointing to the conda env spec YAML for Iris-ugrid.
+
+    iris_commit: str
+        The string for the Iris commit Iris-ugrid is dependent on.
 
     """
     tmp_dir = Path(session.create_tmp())
@@ -162,6 +174,7 @@ def tests(session):
     )
 
     IRIS_DIR = Path(session.virtualenv.location) / "iris"
+    # Convert the Iris branch reference into an absolute commit hash.
     github_branch_api = (
         f"https://api.github.com/repos/SciTools/iris/branches/{IRIS_BRANCH}"
     )
