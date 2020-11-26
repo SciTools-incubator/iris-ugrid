@@ -161,7 +161,10 @@ def tests(session):
     )
     iris_commit = requests.get(github_branch_api).json()["commit"]["sha"]
     env_spec_self = (
-        Path("requirements") / "ci" / f"py{PY_VER.replace('.', '')}.yml"
+        INSTALL_DIR
+        / "requirements"
+        / "ci"
+        / f"py{PY_VER.replace('.', '')}.yml"
     )
 
     if not venv_cached(session, env_spec_self, iris_commit):
