@@ -215,7 +215,7 @@ def tests(session):
         #######################################################################
 
         # Install dependencies.
-        conda_env_update(env_spec_self)
+        conda_env_update(env_spec_self.absolute())
 
         cache_venv(session, env_spec_self, iris_commit)
 
