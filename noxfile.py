@@ -229,7 +229,7 @@ def tests(session):
             f"udunits2_path = {session.virtualenv.location}/lib/libudunits2.so",
         ]
         site_cfg_path = IRIS_DIR / "lib" / "iris" / "etc" / "site.cfg"
-        with open(site_cfg_path, "w+") as site_cfg:
+        with site_cfg_path.open("w+") as site_cfg:
             site_cfg.writelines(line + "\n" for line in site_cfg_content)
 
         # Install Iris.
