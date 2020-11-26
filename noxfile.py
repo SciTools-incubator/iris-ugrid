@@ -28,7 +28,7 @@ PY_VER = os.environ.get("PY_VER", "3.7")
 IRIS_BRANCH = "ugrid"
 
 
-def venv_cached(session, env_spec_path, iris_commit):
+def venv_cached(session, cache_info_path, env_spec_path, iris_commit):
     """
     Determine whether the nox session environment has been cached.
 
@@ -36,6 +36,10 @@ def venv_cached(session, env_spec_path, iris_commit):
     ----------
     session: object
         A `nox.sessions.Session` object.
+
+    cache_info_path: Path
+        A Path object pointing to the expected directory that would contain
+        cache info.
 
     env_spec_path: pathlib.Path
         A Path object pointing to the conda env spec YAML for Iris-ugrid.
@@ -49,12 +53,10 @@ def venv_cached(session, env_spec_path, iris_commit):
         Whether the session has been cached.
 
     """
-    cache_dir = Path(session.virtualenv.location) / "cache"
-
     result = False
 
-    cache_env_spec = cache_dir / env_spec_path.name
-    cache_iris_commit = cache_dir / "iris-commit"
+    cache_env_spec = cache_info_path / env_spec_path.name
+    cache_iris_commit = cache_info_path / "iris-commit"
     caches_found = all(
         [file.is_file() for file in (cache_env_spec, cache_iris_commit)]
     )
@@ -76,7 +78,7 @@ def venv_cached(session, env_spec_path, iris_commit):
     return result
 
 
-def cache_venv(session, env_spec_path, iris_commit):
+def cache_venv(session, cache_info_path, env_spec_path, iris_commit):
     """
     Cache the nox session environment.
 
@@ -88,6 +90,10 @@ def cache_venv(session, env_spec_path, iris_commit):
     session: object
         A `nox.sessions.Session` object.
 
+    cache_info_path: pathlib.Path
+        A Path object denoting the directory that cache info should be written
+        to.
+
     env_spec_path: pathlib.Path
         A Path object pointing to the conda env spec YAML for Iris-ugrid.
 
@@ -95,17 +101,16 @@ def cache_venv(session, env_spec_path, iris_commit):
         The string for the Iris commit Iris-ugrid is dependent on.
 
     """
-    cache_dir = Path(session.virtualenv.location) / "cache"
-    if not cache_dir.is_dir():
-        cache_dir.mkdir()
+    if not cache_info_path.is_dir():
+        cache_info_path.mkdir()
 
     with env_spec_path.open("rb") as fi:
         hexdigest = sha256(fi.read()).hexdigest()
-    cache_env_spec = cache_dir / env_spec_path.name
+    cache_env_spec = cache_info_path / env_spec_path.name
     with cache_env_spec.open("w+") as fo:
         fo.write(hexdigest)
 
-    cache_iris_commit = cache_dir / "iris-commit"
+    cache_iris_commit = cache_info_path / "iris-commit"
     with cache_iris_commit.open("w+") as fo:
         fo.write(iris_commit)
 
@@ -182,7 +187,8 @@ def tests(session):
     )
     iris_commit = requests.get(github_branch_api).json()["commit"]["sha"]
 
-    if not venv_cached(session, env_spec_self, iris_commit):
+    cache_info_path = Path(session.virtualenv.location) / "nox_cache_info"
+    if not venv_cached(session, cache_info_path, env_spec_self, iris_commit):
 
         def conda_env_update(env_spec_path):
             # Back-door approach to force nox to use "conda env update".
@@ -235,7 +241,7 @@ def tests(session):
         # Install dependencies.
         conda_env_update(env_spec_self)
 
-        cache_venv(session, env_spec_self, iris_commit)
+        cache_venv(session, cache_info_path, env_spec_self, iris_commit)
 
     # Install Iris-ugrid.
     # FOR NOW : just put it on the module searchpath (no actual install code).
