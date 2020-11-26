@@ -244,13 +244,4 @@ def tests(session):
 
         cache_venv(session, cache_info_path, env_spec_self, iris_commit)
 
-    # Install Iris-ugrid.
-    # FOR NOW : just put it on the module searchpath (no actual install code).
-    os.chdir(INSTALL_DIR)
-    pythonpath_original = os.environ.get("PYTHONPATH")
-    pythonpath_new = str(INSTALL_DIR)
-    if pythonpath_original:
-        pythonpath_new += f":{pythonpath_original}"
-    os.environ["PYTHONPATH"] = pythonpath_new
-
     session.run("pytest", "-v", str(PACKAGE))
