@@ -153,7 +153,7 @@ def tests(session):
     """
     import requests
 
-    INSTALL_DIR = Path()
+    INSTALL_DIR = Path().absolute()
 
     IRIS_DIR = Path(session.virtualenv.location) / "iris"
     github_branch_api = (
@@ -218,7 +218,7 @@ def tests(session):
         #######################################################################
 
         # Install dependencies.
-        conda_env_update(env_spec_self.absolute())
+        conda_env_update(env_spec_self)
 
         cache_venv(session, env_spec_self, iris_commit)
 
