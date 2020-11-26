@@ -153,19 +153,19 @@ def tests(session):
     """
     import requests
 
-    INSTALL_DIR = Path().absolute()
-
-    IRIS_DIR = Path(session.virtualenv.location) / "iris"
-    github_branch_api = (
-        f"https://api.github.com/repos/SciTools/iris/branches/{IRIS_BRANCH}"
-    )
-    iris_commit = requests.get(github_branch_api).json()["commit"]["sha"]
+    INSTALL_DIR = Path().cwd().absolute()
     env_spec_self = (
         INSTALL_DIR
         / "requirements"
         / "ci"
         / f"py{PY_VER.replace('.', '')}.yml"
     )
+
+    IRIS_DIR = Path(session.virtualenv.location) / "iris"
+    github_branch_api = (
+        f"https://api.github.com/repos/SciTools/iris/branches/{IRIS_BRANCH}"
+    )
+    iris_commit = requests.get(github_branch_api).json()["commit"]["sha"]
 
     if not venv_cached(session, env_spec_self, iris_commit):
 
