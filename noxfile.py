@@ -25,7 +25,8 @@ PACKAGE = Path("iris_ugrid").absolute()
 PY_VER = os.environ.get("PY_VER", "3.7")
 
 # Git branch of iris that iris-ugrid depends on.
-IRIS_BRANCH = "ugrid"
+with Path("requirements").joinpath("manual", "iris_branch.txt").open() as fi:
+    IRIS_BRANCH = fi.read().strip()
 
 
 def venv_cached(session, cache_info_path, env_spec_path, iris_commit):

@@ -28,9 +28,9 @@ env:
   # Pip package to be upgraded/installed.
   PIP_CACHE_PACKAGES: "pip setuptools wheel nox"
   # Git branch of iris that iris-ugrid depends on.
-  IRIS_BRANCH: "ugrid"
+  IRIS_BRANCH: $(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_branch.txt)
   # Git commit for iris test data.
-  IRIS_TEST_DATA_REF: "672dbb46c986038fa5d06a3d8aad691fd1951e07"
+  IRIS_TEST_DATA_REF: $(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_test_data_ref.txt)
   # Base directory for the iris-test-data.
   IRIS_TEST_DATA_DIR: ${HOME}/iris-test-data
 
@@ -92,7 +92,7 @@ linux_task:
   data_cache:
     folder: ${IRIS_TEST_DATA_DIR}
     fingerprint_script:
-      - echo "${IRIS_TEST_DATA_REF}"
+      - echo "S{IRIS_TEST_DATA_REF}"
     populate_script:
       - wget --quiet https://github.com/SciTools/iris-test-data/archive/${IRIS_TEST_DATA_REF}.zip -O iris-test-data.zip
       - unzip -q iris-test-data.zip
