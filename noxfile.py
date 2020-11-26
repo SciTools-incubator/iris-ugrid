@@ -118,7 +118,7 @@ def cache_venv(session, cache_info_path, env_spec_path, iris_commit):
 @nox.session
 def flake8(session):
     """
-    Perform flake8 linting of iris.
+    Perform flake8 linting of iris-ugrid.
 
     Parameters
     ----------
@@ -137,7 +137,7 @@ def flake8(session):
 @nox.session
 def black(session):
     """
-    Perform black format checking of iris.
+    Perform black format checking of iris-ugrid.
 
     Parameters
     ----------
@@ -156,7 +156,7 @@ def black(session):
 @nox.session(python=[PY_VER], venv_backend="conda")
 def tests(session):
     """
-    Perform iris system, integration and unit tests.
+    Perform iris-ugrid tests.
 
     Parameters
     ----------
