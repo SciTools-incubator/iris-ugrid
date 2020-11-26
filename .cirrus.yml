@@ -27,10 +27,6 @@ env:
   PIP_CACHE_BUILD: "0"
   # Pip package to be upgraded/installed.
   PIP_CACHE_PACKAGES: "pip setuptools wheel nox"
-  # Git branch of iris that iris-ugrid depends on.
-  IRIS_BRANCH: $(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_branch.txt)
-  # Git commit for iris test data.
-  IRIS_TEST_DATA_REF: $(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_test_data_ref.txt)
   # Base directory for the iris-test-data.
   IRIS_TEST_DATA_DIR: ${HOME}/iris-test-data
 
@@ -85,6 +81,7 @@ linux_task:
   nox_cache:
     folder: ${CIRRUS_WORKING_DIR}/.nox
     fingerprint_script:
+      - export IRIS_BRANCH=$(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_branch.txt)
       - echo "${CIRRUS_TASK_NAME}"
       - echo "$(date +%Y).$(($(date +%U) / ${CACHE_PERIOD})):${NOX_CACHE_BUILD}"
       - python -c "import os, requests; iris_branch=os.environ['IRIS_BRANCH']; print(requests.get(f'https://api.github.com/repos/SciTools/iris/branches/{iris_branch}').json()['commit']['sha'])"
@@ -92,6 +89,7 @@ linux_task:
   data_cache:
     folder: ${IRIS_TEST_DATA_DIR}
     fingerprint_script:
+      - export IRIS_TEST_DATA_REF=$(cat ${CIRRUS_WORKING_DIR}/requirements/manual/iris_test_data_ref.txt)
       - echo "S{IRIS_TEST_DATA_REF}"
     populate_script:
       - wget --quiet https://github.com/SciTools/iris-test-data/archive/${IRIS_TEST_DATA_REF}.zip -O iris-test-data.zip
