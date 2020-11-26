@@ -8,7 +8,6 @@ For further details, see https://nox.thea.codes/en/stable/#
 from hashlib import sha256
 import os
 from pathlib import Path
-import requests
 from shutil import rmtree
 from urllib.request import urlretrieve
 from zipfile import ZipFile
@@ -152,6 +151,8 @@ def tests(session):
       - https://github.com/theacodes/nox/issues/260
 
     """
+    import requests
+
     INSTALL_DIR = Path()
 
     IRIS_DIR = Path(session.virtualenv.location) / "iris"
