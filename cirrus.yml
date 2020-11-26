@@ -29,8 +29,6 @@ env:
   PIP_CACHE_PACKAGES: "pip setuptools wheel nox"
   # Git branch of iris that iris-ugrid depends on.
   IRIS_BRANCH: "ugrid"
-  # Base directory for iris.
-  IRIS_DIR: ${HOME}/iris
   # Git commit for iris test data.
   IRIS_TEST_DATA_REF: "672dbb46c986038fa5d06a3d8aad691fd1951e07"
   # Base directory for the iris-test-data.
