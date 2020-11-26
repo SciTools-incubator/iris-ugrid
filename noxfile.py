@@ -197,13 +197,13 @@ def tests(session):
         github_archive_url = (
             f"https://github.com/SciTools/iris/archive/{iris_commit}.zip"
         )
-        iris_zip = urlretrieve(github_archive_url, "iris.zip")[0]
+        iris_zip = Path(urlretrieve(github_archive_url, "iris.zip")[0])
         with ZipFile(iris_zip, "r") as zip_open:
             zip_open.extractall()
         if IRIS_DIR.is_dir():
             rmtree(IRIS_DIR)
-        os.rename(Path(f"iris-{iris_commit}"), IRIS_DIR)
-        os.remove(iris_zip)
+        Path(f"iris-{iris_commit}").rename(IRIS_DIR)
+        iris_zip.unlink()
 
         # Install Iris dependencies.
         env_spec_iris = (
