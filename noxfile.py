@@ -49,25 +49,25 @@ def venv_cached(session, env_spec_path, iris_commit):
         Whether the session has been cached.
 
     """
-    tmp_dir = Path(session.create_tmp())
+    cache_dir = Path(session.virtualenv.location) / "cache"
 
     result = False
 
-    cache_env_spec = tmp_dir / env_spec_path.name
-    cache_iris_commit = tmp_dir / "iris-commit"
+    cache_env_spec = cache_dir / env_spec_path.name
+    cache_iris_commit = cache_dir / "iris-commit"
     caches_found = all(
         [file.is_file() for file in (cache_env_spec, cache_iris_commit)]
     )
 
     if caches_found:
-        with open(env_spec_path, "rb") as fi:
+        with env_spec_path.open("rb") as fi:
             expected = sha256(fi.read()).hexdigest()
-        with open(cache_env_spec, "r") as fi:
+        with cache_env_spec.open("r") as fi:
             actual = fi.read()
         ok_env_spec = actual == expected
 
         expected = iris_commit
-        with open(cache_iris_commit, "r") as fi:
+        with cache_iris_commit.open("r") as fi:
             actual = fi.read()
         ok_iris_commit = actual == expected
 
@@ -95,16 +95,18 @@ def cache_venv(session, env_spec_path, iris_commit):
         The string for the Iris commit Iris-ugrid is dependent on.
 
     """
-    tmp_dir = Path(session.create_tmp())
+    cache_dir = Path(session.virtualenv.location) / "cache"
+    if not cache_dir.is_dir():
+        cache_dir.mkdir()
 
-    with open(env_spec_path, "rb") as fi:
+    with env_spec_path.open("rb") as fi:
         hexdigest = sha256(fi.read()).hexdigest()
-    cache_env_spec = tmp_dir / env_spec_path.name
-    with open(cache_env_spec, "w") as fo:
+    cache_env_spec = cache_dir / env_spec_path.name
+    with cache_env_spec.open("w+") as fo:
         fo.write(hexdigest)
 
-    cache_iris_commit = tmp_dir / "iris-commit"
-    with open(cache_iris_commit, "w") as fo:
+    cache_iris_commit = cache_dir / "iris-commit"
+    with cache_iris_commit.open("w+") as fo:
         fo.write(iris_commit)
 
 
