@@ -154,7 +154,7 @@ def tests(session):
     """
     INSTALL_DIR = Path()
 
-    IRIS_DIR = Path("iris")
+    IRIS_DIR = Path(session.virtualenv.location) / "iris"
     github_branch_api = (
         f"https://api.github.com/repos/SciTools/iris/branches/{IRIS_BRANCH}"
     )
@@ -181,7 +181,8 @@ def tests(session):
         iris_zip = urlretrieve(github_archive_url, "iris.zip")[0]
         with ZipFile(iris_zip, "r") as zip_open:
             zip_open.extractall()
-        rmtree(IRIS_DIR)
+        if IRIS_DIR.is_dir():
+            rmtree(IRIS_DIR)
         os.rename(Path(f"iris-{iris_commit}"), IRIS_DIR)
         os.remove(iris_zip)
 
