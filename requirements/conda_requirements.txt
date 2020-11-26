@@ -2,3 +2,4 @@ black=19.10b0
 esmpy>=8.0.1
 gridded
 pytest
+setuptools
