@@ -24,9 +24,9 @@ PACKAGE = Path("iris_ugrid").absolute()
 #: Cirrus-CI environment variable hook.
 PY_VER = os.environ.get("PY_VER", "3.7")
 
-# Git branch of iris that iris-ugrid depends on.
-with Path("requirements").joinpath("manual", "iris_branch.txt").open() as fi:
-    IRIS_BRANCH = fi.read().strip()
+# Git commit of iris that iris-ugrid depends on.
+with Path("requirements").joinpath("manual", "iris_commit.txt").open() as fi:
+    IRIS_COMMIT = fi.read().strip()
 
 
 def venv_cached(session, cache_info_path, env_spec_path, iris_commit):
@@ -171,8 +171,6 @@ def tests(session):
       - https://github.com/theacodes/nox/issues/260
 
     """
-    import requests
-
     INSTALL_DIR = Path().cwd().absolute()
     env_spec_self = (
         INSTALL_DIR
@@ -182,14 +180,9 @@ def tests(session):
     )
 
     IRIS_DIR = Path(session.virtualenv.location) / "iris"
-    # Convert the Iris branch reference into an absolute commit hash.
-    github_branch_api = (
-        f"https://api.github.com/repos/SciTools/iris/branches/{IRIS_BRANCH}"
-    )
-    iris_commit = requests.get(github_branch_api).json()["commit"]["sha"]
 
     cache_info_path = Path(session.virtualenv.location) / "nox_cache_info"
-    if not venv_cached(session, cache_info_path, env_spec_self, iris_commit):
+    if not venv_cached(session, cache_info_path, env_spec_self, IRIS_COMMIT):
 
         def conda_env_update(env_spec_path):
             # Back-door approach to force nox to use "conda env update".
@@ -202,14 +195,14 @@ def tests(session):
 
         # Download Iris.
         github_archive_url = (
-            f"https://github.com/SciTools/iris/archive/{iris_commit}.zip"
+            f"https://github.com/SciTools/iris/archive/{IRIS_COMMIT}.zip"
         )
         iris_zip = Path(urlretrieve(github_archive_url, "iris.zip")[0])
         with ZipFile(iris_zip, "r") as zip_open:
             zip_open.extractall()
         if IRIS_DIR.is_dir():
             rmtree(IRIS_DIR)
-        Path(f"iris-{iris_commit}").rename(IRIS_DIR)
+        Path(f"iris-{IRIS_COMMIT}").rename(IRIS_DIR)
         iris_zip.unlink()
 
         # Install Iris dependencies.
@@ -242,6 +235,6 @@ def tests(session):
         # Install dependencies.
         conda_env_update(env_spec_self)
 
-        cache_venv(session, cache_info_path, env_spec_self, iris_commit)
+        cache_venv(session, cache_info_path, env_spec_self, IRIS_COMMIT)
 
     session.run("pytest", "-v", str(PACKAGE))
