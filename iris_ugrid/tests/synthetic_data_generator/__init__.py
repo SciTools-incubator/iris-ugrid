@@ -15,7 +15,12 @@ import numpy as np
 
 
 def create_file(
-    temp_file_dir, dataset_name, file_type, n_faces=866, n_times=1, n_levels=1
+    temp_file_dir,
+    dataset_name,
+    dataset_type,
+    n_faces=866,
+    n_times=1,
+    n_levels=39,
 ):
     """Create a synthetic NetCDF file with XIOS-like content.
 
@@ -28,9 +33,10 @@ def create_file(
         The directory in which to place the created file.
     dataset_name : str
         The name for the NetCDF dataset and also the created file.
-    file_type : str
+    dataset_type : str
         Name of the type of dataset to write to the file. The name = the name
-        of the template CDL string file to fetch from the `mesh_headers/` directory.
+        of the template CDL string file to fetch from the `mesh_headers/`
+        directory.
     n_faces, n_times, n_levels : int
         Descriptors for the desired dimensions of the file's dataset.
 
@@ -44,7 +50,9 @@ def create_file(
     # Fetch the specified CDL template type, modify the placeholders for the
     # specified dimensions.
     templates_dir = Path(__file__).parent / "mesh_headers"
-    template_filepath = templates_dir.joinpath(file_type).with_suffix(".txt")
+    template_filepath = templates_dir.joinpath(dataset_type).with_suffix(
+        ".txt"
+    )
     with open(template_filepath) as file:
         template_string = Template(file.read())
     cdl = template_string.substitute(
@@ -101,7 +109,7 @@ def create_file__xios_half_levels_faces(
     return create_file(
         temp_file_dir=temp_file_dir,
         dataset_name=dataset_name,
-        file_type="2D_face_half_levels",
+        dataset_type="2D_face_half_levels",
         n_faces=n_faces,
         n_times=n_times,
     )
