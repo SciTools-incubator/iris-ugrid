@@ -52,8 +52,8 @@ class Test_create_file__xios_half_levels_faces(tests.IrisTest):
 
     def check_ucube(self, cube, expected_shape):
         # Basic checks on the primary data cube.
-        self.assertEqual(cube.var_name, "conv_rain")
-        self.assertEqual(cube.long_name, "surface_convective_rainfall_rate")
+        self.assertEqual(cube.var_name, "thing")
+        self.assertEqual(cube.long_name, "thingness")
         self.assertEqual(cube.shape, expected_shape)
 
         # Also a few checks on the attached grid information.
