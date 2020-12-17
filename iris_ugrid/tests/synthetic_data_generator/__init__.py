@@ -74,13 +74,6 @@ def create_file(
     # Load the netcdf file and post-modify it to define the variable data contents.
     ds = netCDF4.Dataset(nc_filepath, "r+")
 
-    def should_be_monotonic(variable):
-        """Variables not associated with the mesh should be monotonic."""
-        has_mesh_dims = any(
-            [dim_name.startswith("nMesh") for dim_name in variable.dimensions]
-        )
-        return not (has_mesh_dims or var.name.startswith("Mesh"))
-
     # Fill all data variables (both mesh and phenomenon vars) with zeros.
     for var in ds.variables.values():
         shape = list(var.shape)
@@ -91,7 +84,7 @@ def create_file(
             for dim, size in zip(dims, shape)
         ]
         data = np.zeros(shape, dtype=var.dtype)
-        if should_be_monotonic(var):
+        if len(var.dimensions) == 1 and var.dimensions[0] == var.name:
             # Fill the var with ascending values (not all zeroes), so it can be a dim-coord.
             data = np.arange(data.size, dtype=data.dtype).reshape(data.shape)
         var[:] = data
