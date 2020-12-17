@@ -74,25 +74,25 @@ class Test_create_file(tests.IrisTest):
 
     def test_basic_load(self):
         cube = self.create_synthetic_testcube(
-            dataset_type="2D_face_half_levels"
+            dataset_type="xios_2D_face_half_levels"
         )
         self.check_ucube(cube, shape=(1, 866), location="face", level="half")
 
     def test_scale_mesh(self):
         cube = self.create_synthetic_testcube(
-            dataset_type="2D_face_half_levels", n_faces=10
+            dataset_type="xios_2D_face_half_levels", n_faces=10
         )
         self.check_ucube(cube, shape=(1, 10), location="face", level="half")
 
     def test_scale_time(self):
         cube = self.create_synthetic_testcube(
-            dataset_type="2D_face_half_levels", n_times=3
+            dataset_type="xios_2D_face_half_levels", n_times=3
         )
         self.check_ucube(cube, shape=(3, 866), location="face", level="half")
 
     def test_3D(self):
         cube = self.create_synthetic_testcube(
-            dataset_type="3D_face_half_levels"
+            dataset_type="xios_3D_face_half_levels"
         )
         self.check_ucube(
             cube, shape=(1, 39, 866), location="face", level="half"
@@ -100,7 +100,7 @@ class Test_create_file(tests.IrisTest):
 
     def test_full_levels(self):
         cube = self.create_synthetic_testcube(
-            dataset_type="3D_face_full_levels"
+            dataset_type="xios_3D_face_full_levels"
         )
         self.check_ucube(
             cube, shape=(1, 39, 866), location="face", level="full"

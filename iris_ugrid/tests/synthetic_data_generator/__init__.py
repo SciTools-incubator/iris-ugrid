@@ -102,7 +102,7 @@ def create_file__xios_half_levels_faces(
     return create_file(
         temp_file_dir=temp_file_dir,
         dataset_name=dataset_name,
-        dataset_type="2D_face_half_levels",
+        dataset_type="xios_2D_face_half_levels",
         n_faces=n_faces,
         n_times=n_times,
     )
