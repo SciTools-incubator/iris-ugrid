@@ -24,7 +24,7 @@ from iris_ugrid.tests.synthetic_data_generator import (
 )
 
 
-class Create_file_mixin(tests.IrisTest):
+class CreateFileMixin(tests.IrisTest):
     @classmethod
     def setUpClass(cls):
         # Create a temp directory for transient test files.
@@ -36,10 +36,12 @@ class Create_file_mixin(tests.IrisTest):
         shutil.rmtree(cls.temp_dir)
 
     def create_synthetic_file(self, **create_kwargs):
-        # Placeholder that will be overridden by sub-classes.
-        return create_file__xios_2d_face_half_levels(
-            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
-        )
+        # Should be overridden to invoke one of the create_file_ functions.
+        # E.g.
+        # return create_file__xios_2d_face_half_levels(
+        #     temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
+        # )
+        raise NotImplementedError
 
     def create_synthetic_testcube(self, **create_kwargs):
         file_path = self.create_synthetic_file(**create_kwargs)
@@ -77,7 +79,7 @@ class Create_file_mixin(tests.IrisTest):
         self.assertEqual(ugrid.face_coordinates.shape, (shape[last_dim], 2))
 
 
-class Test_create_file__xios_2d_face_half_levels(Create_file_mixin):
+class Test_create_file__xios_2d_face_half_levels(CreateFileMixin):
     def create_synthetic_file(self, **create_kwargs):
         return create_file__xios_2d_face_half_levels(
             temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
@@ -96,7 +98,7 @@ class Test_create_file__xios_2d_face_half_levels(Create_file_mixin):
         self.check_ucube(cube, shape=(3, 866), location="face", level="half")
 
 
-class Test_create_file__xios_3d_face_half_levels(Create_file_mixin):
+class Test_create_file__xios_3d_face_half_levels(CreateFileMixin):
     def create_synthetic_file(self, **create_kwargs):
         return create_file__xios_3d_face_half_levels(
             temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
@@ -127,7 +129,7 @@ class Test_create_file__xios_3d_face_half_levels(Create_file_mixin):
         )
 
 
-class Test_create_file__xios_3d_face_full_levels(Create_file_mixin):
+class Test_create_file__xios_3d_face_full_levels(CreateFileMixin):
     def create_synthetic_file(self, **create_kwargs):
         return create_file__xios_3d_face_full_levels(
             temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
