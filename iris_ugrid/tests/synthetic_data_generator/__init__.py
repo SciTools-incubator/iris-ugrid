@@ -61,7 +61,7 @@ def _add_standard_data(nc_path, unlimited_dim_size=0):
     """Shared data populating behaviour.
 
     Adds placeholder data to the variables in a NetCDF file, accounting for
-    dimension size, unlimited dimensions and 'dimension coordinates'.
+    dimension size, 'dimension coordinates' and a possible unlimited dimension.
     """
 
     ds = netCDF4.Dataset(nc_path, "r+")
@@ -72,7 +72,8 @@ def _add_standard_data(nc_path, unlimited_dim_size=0):
     # Data addition dependent on this assumption:
     assert len(unlimited_dim_names) < 2
 
-    # Fill all data variables (both mesh and phenomenon vars) with zeros.
+    # Fill all data variables (both mesh and phenomenon vars) with placeholder
+    # numbers.
     for var in ds.variables.values():
         shape = list(var.shape)
         dims = var.dimensions
