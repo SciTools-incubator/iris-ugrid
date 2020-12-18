@@ -17,10 +17,14 @@ import iris.tests as tests
 from gridded.pyugrid.ugrid import UGrid
 from iris_ugrid.ucube import UCube
 from iris_ugrid.ugrid_cf_reader import CubeUgrid, load_cubes
-from iris_ugrid.tests.synthetic_data_generator import create_file
+from iris_ugrid.tests.synthetic_data_generator import (
+    create_file__xios_2d_face_half_levels,
+    create_file__xios_3d_face_half_levels,
+    create_file__xios_3d_face_full_levels,
+)
 
 
-class Test_create_file(tests.IrisTest):
+class Create_file_mixin(tests.IrisTest):
     @classmethod
     def setUpClass(cls):
         # Create a temp directory for transient test files.
@@ -31,14 +35,14 @@ class Test_create_file(tests.IrisTest):
         # Destroy the temp directory.
         shutil.rmtree(cls.temp_dir)
 
-    def create_synthetic_testcube(self, dataset_type, **create_kwargs):
-
-        file_path = create_file(
-            temp_file_dir=self.temp_dir,
-            dataset_name="mesh",
-            dataset_type=dataset_type,
-            **create_kwargs,
+    def create_synthetic_file(self, **create_kwargs):
+        # Placeholder that will be overridden by sub-classes.
+        return create_file__xios_2d_face_half_levels(
+            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
         )
+
+    def create_synthetic_testcube(self, **create_kwargs):
+        file_path = self.create_synthetic_file(**create_kwargs)
 
         # cube = iris.load_cube(file_path, "theta")
         # Note: cannot use iris.load, as merge can not yet handle UCubes.
@@ -72,38 +76,85 @@ class Test_create_file(tests.IrisTest):
         self.assertIsNotNone(ugrid.face_coordinates)
         self.assertEqual(ugrid.face_coordinates.shape, (shape[last_dim], 2))
 
-    def test_basic_load(self):
-        cube = self.create_synthetic_testcube(
-            dataset_type="xios_2D_face_half_levels"
+
+class Test_create_file__xios_2d_face_half_levels(Create_file_mixin):
+    def create_synthetic_file(self, **create_kwargs):
+        return create_file__xios_2d_face_half_levels(
+            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
         )
+
+    def test_basic_load(self):
+        cube = self.create_synthetic_testcube()
         self.check_ucube(cube, shape=(1, 866), location="face", level="half")
 
     def test_scale_mesh(self):
-        cube = self.create_synthetic_testcube(
-            dataset_type="xios_2D_face_half_levels", n_faces=10
-        )
+        cube = self.create_synthetic_testcube(n_faces=10)
         self.check_ucube(cube, shape=(1, 10), location="face", level="half")
 
     def test_scale_time(self):
-        cube = self.create_synthetic_testcube(
-            dataset_type="xios_2D_face_half_levels", n_times=3
-        )
+        cube = self.create_synthetic_testcube(n_times=3)
         self.check_ucube(cube, shape=(3, 866), location="face", level="half")
 
-    def test_3D(self):
-        cube = self.create_synthetic_testcube(
-            dataset_type="xios_3D_face_half_levels"
-        )
-        self.check_ucube(
-            cube, shape=(1, 39, 866), location="face", level="half"
+
+class Test_create_file__xios_3d_face_half_levels(Create_file_mixin):
+    def create_synthetic_file(self, **create_kwargs):
+        return create_file__xios_3d_face_half_levels(
+            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
         )
 
-    def test_full_levels(self):
-        cube = self.create_synthetic_testcube(
-            dataset_type="xios_3D_face_full_levels"
+    def test_basic_load(self):
+        cube = self.create_synthetic_testcube()
+        self.check_ucube(
+            cube, shape=(1, 38, 866), location="face", level="half"
         )
+
+    def test_scale_mesh(self):
+        cube = self.create_synthetic_testcube(n_faces=10)
+        self.check_ucube(
+            cube, shape=(1, 38, 10), location="face", level="half"
+        )
+
+    def test_scale_time(self):
+        cube = self.create_synthetic_testcube(n_times=3)
+        self.check_ucube(
+            cube, shape=(3, 38, 866), location="face", level="half"
+        )
+
+    def test_scale_levels(self):
+        cube = self.create_synthetic_testcube(n_levels=10)
+        self.check_ucube(
+            cube, shape=(1, 10, 866), location="face", level="half"
+        )
+
+
+class Test_create_file__xios_3d_face_full_levels(Create_file_mixin):
+    def create_synthetic_file(self, **create_kwargs):
+        return create_file__xios_3d_face_full_levels(
+            temp_file_dir=self.temp_dir, dataset_name="mesh", **create_kwargs
+        )
+
+    def test_basic_load(self):
+        cube = self.create_synthetic_testcube()
         self.check_ucube(
             cube, shape=(1, 39, 866), location="face", level="full"
+        )
+
+    def test_scale_mesh(self):
+        cube = self.create_synthetic_testcube(n_faces=10)
+        self.check_ucube(
+            cube, shape=(1, 39, 10), location="face", level="full"
+        )
+
+    def test_scale_time(self):
+        cube = self.create_synthetic_testcube(n_times=3)
+        self.check_ucube(
+            cube, shape=(3, 39, 866), location="face", level="full"
+        )
+
+    def test_scale_levels(self):
+        cube = self.create_synthetic_testcube(n_levels=10)
+        self.check_ucube(
+            cube, shape=(1, 10, 866), location="face", level="full"
         )
 
 
