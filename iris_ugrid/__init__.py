@@ -5,4 +5,4 @@
 # licensing details.
 """Top level of iris-ugrid package."""
 
-__version__ = "0.1.0regrid1"
+__version__ = "0.1.dev0"
